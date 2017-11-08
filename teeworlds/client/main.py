@@ -16,7 +16,7 @@ def prepare_exit():
 def main():
     pygame.init()
     screen = pygame.display.set_mode((300, 300), 0, 32)
-
+    start_generating_controller_event(host, port)
 
     #TODO visualiser class
 
