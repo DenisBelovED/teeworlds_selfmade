@@ -9,6 +9,7 @@ controller_proc = None
 
 def start_generating_controller_event(host, port):
     controller_proc = Process(target=Controller, args=(host, port))
+    controller_proc.start()
 
 def prepare_exit():
     controller_proc.terminate()
@@ -20,7 +21,6 @@ def main():
 
     #TODO visualiser class
 
-    controller_proc.start()
     #prepare_exit()
 
 if __name__ == '__main__':
