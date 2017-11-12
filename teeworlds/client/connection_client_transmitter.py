@@ -7,10 +7,12 @@ class Connection:
         self.udp_socket = socket(AF_INET, SOCK_DGRAM)
         self.udp_socket.connect(self.addr)
 
+    def __del__(self):
+        self.destroy_socket()
+
     def send_event(self, event):
         if (not event) or (event.__class__ != str):
             raise KeyError()
-        #print(event)
         self.udp_socket.send(str.encode(event))
 
     #def get_event(self):

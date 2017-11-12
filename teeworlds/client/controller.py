@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
-from connection_client import Connection
+from connection_client_transmitter import Connection
+import os
 
 class Controller:
 
@@ -51,6 +52,7 @@ class Controller:
                 try:
                     if event.type == QUIT:
                         event_loop = False
+                        os._exit()
 
                     if event.type == KEYDOWN:
                         self.handle_keyboard(self.event_key_dict_down[event.key])
