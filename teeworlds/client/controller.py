@@ -11,12 +11,12 @@ class Controller:
         K_SPACE: (K_SPACE, KEYDOWN)
     }
 
-    event_key_dict_up = {
-        K_w: (K_w, KEYUP),
-        K_a: (K_a, KEYUP),
-        K_s: (K_s, KEYUP),
-        K_d: (K_d, KEYUP),
-    }
+    #event_key_dict_up = {
+    #    K_w: (K_w, KEYUP),
+    #    K_a: (K_a, KEYUP),
+    #    K_s: (K_s, KEYUP),
+    #    K_d: (K_d, KEYUP),
+    #}
 
     def __init__(self, ip_host, port):
         self.connection_to_server = Connection(ip_host, port)
@@ -43,6 +43,31 @@ class Controller:
     def events_interceptor(self):
         event_loop = True
         while event_loop:
+            event = pygame.event.poll()
+            try:
+                if event.type == QUIT:
+                    event_loop = False
+
+                if event.type == KEYDOWN:
+                    self.handle_keyboard(self.event_key_dict_down[event.key])
+
+                if event.type == KEYUP:
+                    self.handle_keyboard(self.event_key_dict_up[event.key])
+
+                if event.type == MOUSEBUTTONDOWN:
+                    self.handle_mouse((event.button, event.pos, MOUSEBUTTONDOWN))
+
+                if (event.type == MOUSEBUTTONUP) and (event.button == 3):
+                    self.handle_mouse((event.button, event.pos, MOUSEBUTTONUP))
+            except:
+                pass
+
+        self.connection_to_server.destroy_socket()
+        os._exit()
+
+    '''def events_interceptor(self):
+        event_loop = True
+        while event_loop:
             for event in pygame.event.get():
                 try:
                     if event.type == QUIT:
@@ -60,7 +85,5 @@ class Controller:
                     if (event.type == MOUSEBUTTONUP) and (event.button == 3):
                         self.handle_mouse((event.button, event.pos, MOUSEBUTTONUP))
                 except:
-                    pass
+                    pass'''
 
-        self.connection_to_server.destroy_socket()
-        os._exit()
