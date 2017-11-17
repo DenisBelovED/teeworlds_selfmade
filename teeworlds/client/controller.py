@@ -6,9 +6,7 @@ import os
 class Controller:
 
     event_key_dict_down = {
-        K_w: (K_w, KEYDOWN),
         K_a: (K_a, KEYDOWN),
-        K_s: (K_s, KEYDOWN),
         K_d: (K_d, KEYDOWN),
         K_SPACE: (K_SPACE, KEYDOWN)
     }
@@ -23,9 +21,6 @@ class Controller:
     def __init__(self, ip_host, port):
         self.connection_to_server = Connection(ip_host, port)
         self.events_interceptor()
-
-    def __del__(self):
-        self.connection_to_server.destroy_socket()
 
     def handle_keyboard(self, button_info): #номер нажата/отжата
         self.connection_to_server.send_event(
@@ -52,7 +47,6 @@ class Controller:
                 try:
                     if event.type == QUIT:
                         event_loop = False
-                        os._exit()
 
                     if event.type == KEYDOWN:
                         self.handle_keyboard(self.event_key_dict_down[event.key])
@@ -67,3 +61,6 @@ class Controller:
                         self.handle_mouse((event.button, event.pos, MOUSEBUTTONUP))
                 except:
                     pass
+
+        self.connection_to_server.destroy_socket()
+        os._exit()

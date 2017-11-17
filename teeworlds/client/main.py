@@ -38,7 +38,9 @@ def stop_process(proc_list):
         except:
             pass
 
-def main(proc_list):
+def main():
+    proc_list = []
+
     pygame.init()
     screen = pygame.display.set_mode((300, 300), 0, 32)
 
@@ -52,9 +54,8 @@ def main(proc_list):
         print()
 
 
-    stop_process(proc_list)
     pygame.quit()
+    stop_process(proc_list)
 
 if __name__ == '__main__':
-    proc_list = []
-    main(proc_list)
+    main()
