@@ -1,23 +1,15 @@
-import pygame, sys
+import pygame
 from pygame.locals import *
+from sys import exit
 
+# initializing variables
 pygame.init()
-screen = pygame.display.set_mode((400, 100), 0, 32)
-#pygame.display.set_caption("My First PyGame Windows");
-#helloText = "Hello, World and GCUP"
-#(x, y, fontSize) = (10, 40, 40)
-#myFont = pygame.font.SysFont("None", fontSize)
-#fontColor = (255, 255, 0)
-#bgColor = (255, 255, 255)
-#fontImage = myFont.render(helloText, 0, (fontColor))
-mainLoop = True
+screen = pygame.display.set_mode((640, 480), 0, 24)
 
-while mainLoop:
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            mainLoop = False
-        print(event)
-    #screen.fill(bgColor)
-    #screen.blit(fontImage, (x, y))
-    pygame.display.update()
-pygame.quit()
+# main loop which displays the pressed keys on the screen
+while True:
+    event = pygame.event.poll() #!!!!!
+    press = pygame.key.get_pressed()
+    for i in range(0, len(press)):
+        if press[i] == 1:
+            print(pygame.key.name(i))
