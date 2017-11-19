@@ -2,88 +2,61 @@ import pygame
 from pygame.locals import *
 from connection_client_transmitter import Connection
 import os
+import time
 
 class Controller:
-
-    event_key_dict_down = {
-        K_a: (K_a, KEYDOWN),
-        K_d: (K_d, KEYDOWN),
-        K_SPACE: (K_SPACE, KEYDOWN)
-    }
-
-    #event_key_dict_up = {
-    #    K_w: (K_w, KEYUP),
-    #    K_a: (K_a, KEYUP),
-    #    K_s: (K_s, KEYUP),
-    #    K_d: (K_d, KEYUP),
-    #}
-
     def __init__(self, ip_host, port):
         self.connection_to_server = Connection(ip_host, port)
         self.events_interceptor()
 
-    def handle_keyboard(self, button_info): #номер нажата/отжата
+    def handle_keyboard(self, button_info):
         self.connection_to_server.send_event(
             (
-                str(button_info[0])+' '+
-                str(button_info[1])
+                str(button_info)
             )
         )
+        time.sleep(0.1)
 
     def handle_mouse(self, mouse_info): #номер х у нажата/отжата
         self.connection_to_server.send_event(
             (
                 str(mouse_info[0]) + ' ' +
                 str(mouse_info[1][0]) + ' ' +
-                str(mouse_info[1][1]) + ' ' +
-                str(mouse_info[2])
+                str(mouse_info[1][1])
             )
         )
+        time.sleep(0.1)
 
     def events_interceptor(self):
-        event_loop = True
-        while event_loop:
+
+        while True:
             event = pygame.event.poll()
+            pressed_mouse = pygame.mouse.get_pressed()
+            pressed = pygame.key.get_pressed()
+
             try:
-                if event.type == QUIT:
-                    event_loop = False
-
-                if event.type == KEYDOWN:
-                    self.handle_keyboard(self.event_key_dict_down[event.key])
-
-                if event.type == KEYUP:
-                    self.handle_keyboard(self.event_key_dict_up[event.key])
-
-                if event.type == MOUSEBUTTONDOWN:
-                    self.handle_mouse((event.button, event.pos, MOUSEBUTTONDOWN))
-
-                if (event.type == MOUSEBUTTONUP) and (event.button == 3):
-                    self.handle_mouse((event.button, event.pos, MOUSEBUTTONUP))
+                pos = event.pos
             except:
                 pass
 
+            if (event.type == MOUSEBUTTONDOWN) and (event.button) == 1:
+                self.handle_mouse((1, event.pos))
+
+            if pressed_mouse[2] == 1:
+                self.handle_mouse((3, pos))
+
+            if pressed[K_a] == 1:
+                self.handle_keyboard(K_a)
+
+            if pressed[K_d] == 1:
+                self.handle_keyboard(K_d)
+
+            if (event.type == KEYDOWN) and (event.key == K_SPACE):
+                self.handle_keyboard(K_SPACE)
+
+            if event.type == QUIT:
+                pygame.event.clear()
+                break
+
         self.connection_to_server.destroy_socket()
-        os._exit()
-
-    '''def events_interceptor(self):
-        event_loop = True
-        while event_loop:
-            for event in pygame.event.get():
-                try:
-                    if event.type == QUIT:
-                        event_loop = False
-
-                    if event.type == KEYDOWN:
-                        self.handle_keyboard(self.event_key_dict_down[event.key])
-
-                    if event.type == KEYUP:
-                        self.handle_keyboard(self.event_key_dict_up[event.key])
-
-                    if event.type == MOUSEBUTTONDOWN:
-                        self.handle_mouse((event.button, event.pos, MOUSEBUTTONDOWN))
-
-                    if (event.type == MOUSEBUTTONUP) and (event.button == 3):
-                        self.handle_mouse((event.button, event.pos, MOUSEBUTTONUP))
-                except:
-                    pass'''
-
+        os._exit(0)
