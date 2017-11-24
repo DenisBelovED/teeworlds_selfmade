@@ -7,7 +7,7 @@ class Data_reciver:
         self.udp_socket.bind(self.addr)
 
         while True:
-            data_queue.put_nowait(self.udp_socket.recvfrom(11)) # warning !!!
+            data_queue.put_nowait(self.udp_socket.recvfrom(11)) # warning !!! TODO count bytes
 
     def __del__(self):
         self.udp_socket.close()

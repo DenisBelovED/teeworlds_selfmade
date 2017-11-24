@@ -36,20 +36,35 @@ def stop_process(proc_list):
         except:
             pass
 
-def main():
-    proc_list = []
+def run_game(s_host, s_port, c_host, c_port, proc_list):
 
-    controller_proc = start_generating_controller_event(server_host, server_port, proc_list) #запуск процесса отправки событий на сервер
-    get_world_state_queue = start_reciving_world_state(client_host, client_port, proc_list) #труба, получалка "кадров" от сервера
+    # запуск процесса отправки событий на сервер
+    controller_proc = start_generating_controller_event(
+        s_host,
+        s_port,
+        proc_list
+    )
 
-    while controller_proc.is_alive(): #TODO correct exit
+    # труба, получалка "кадров" от сервера
+    get_world_state_queue = start_reciving_world_state(
+        c_host,
+        c_port,
+        proc_list
+    )
+
+    while controller_proc.is_alive():
         try:
             picture = get_world_state_queue.get(timeout=1)
-            print('recive', picture)
-            print('from', client_host, client_port)
+            print('recive', picture, 'from', c_host, c_port)
             print()
         except:
             print('empty queue')
+
+
+def main():
+    proc_list = []
+
+    run_game(server_host, server_port, client_host, client_port, proc_list)
 
     stop_process(proc_list)
 
