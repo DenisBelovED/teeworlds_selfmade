@@ -5,7 +5,7 @@ class Display:
         pygame.init()
         pygame.display.set_mode((300, 300), 0, 32)
 
-    def kill_screen():
+    def kill_screen(self):
         pygame.quit()
 
 

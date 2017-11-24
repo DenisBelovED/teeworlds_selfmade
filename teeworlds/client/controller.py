@@ -62,9 +62,6 @@ class Controller:
                 pygame.event.clear()
                 break
 
-        display.kill_screen()
         self.connection_to_server.destroy_socket()
+        display.kill_screen()
         os._exit(0)
-
-#if __name__ == '__main__':
-#    controller = Controller()

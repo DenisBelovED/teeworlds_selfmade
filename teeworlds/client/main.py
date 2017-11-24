@@ -1,7 +1,7 @@
 from multiprocessing import Process, Pipe, Queue
-import os, signal
 from controller import Controller
 from connection_client_reciver import Data_reciver
+import psutil #piped
 
 server_host = '127.0.0.1'
 server_port = 2056
@@ -32,7 +32,7 @@ def start_reciving_world_state(server_host, server_port, proc_list):
 def stop_process(proc_list):
     for proc in proc_list:
         try:
-            os.kill(proc.pid, signal.SIGKILL)
+            psutil.Process(proc.pid).kill()
         except:
             pass
 
