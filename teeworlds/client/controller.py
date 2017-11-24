@@ -29,6 +29,10 @@ class Controller:
 
     def events_interceptor(self):
 
+        from display_class import display #!!!! какая-то магия
+        # порождает объект display при каждом import'e
+        # проблема в том, что при вызове name_process.start() происходит повторный вызов в main файле, но тут всё норм...
+
         while True:
             event = pygame.event.poll()
             pressed_mouse = pygame.mouse.get_pressed()
@@ -58,5 +62,9 @@ class Controller:
                 pygame.event.clear()
                 break
 
+        display.kill_screen()
         self.connection_to_server.destroy_socket()
         os._exit(0)
+
+#if __name__ == '__main__':
+#    controller = Controller()

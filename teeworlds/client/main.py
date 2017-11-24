@@ -1,8 +1,7 @@
-import pygame
-from controller import Controller
 from multiprocessing import Process, Pipe, Queue
-from connection_client_reciver import Data_reciver
 import os, signal
+from controller import Controller
+from connection_client_reciver import Data_reciver
 
 server_host = '127.0.0.1'
 server_port = 2056
@@ -40,9 +39,6 @@ def stop_process(proc_list):
 def main():
     proc_list = []
 
-    pygame.init()
-    screen = pygame.display.set_mode((300, 300), 0, 32)
-
     controller_proc = start_generating_controller_event(server_host, server_port, proc_list) #запуск процесса отправки событий на сервер
     get_world_state_queue = start_reciving_world_state(client_host, client_port, proc_list) #труба, получалка "кадров" от сервера
 
@@ -55,8 +51,6 @@ def main():
         except:
             print('empty queue')
 
-
-    pygame.quit()
     stop_process(proc_list)
 
 if __name__ == '__main__':
