@@ -1,14 +1,16 @@
 import pygame
 from pygame.locals import *
-from connection_client_transmitter import Connection
 import os
 import time
 
+from connection_client_transmitter import Connection # класс, выделяющий сокет
+
 class Controller:
     def __init__(self, ip_host, port):
-        self.connection_to_server = Connection(ip_host, port)
-        self.events_interceptor()
+        self.connection_to_server = Connection(ip_host, port) # инициируем сокет для отправки данных
+        self.events_interceptor() # запускаем цикл перехвата кнопок
 
+    # метод отправляет на сервер байты "номер_клавиши"
     def handle_keyboard(self, button_info):
         self.connection_to_server.send_event(
             (
@@ -17,7 +19,8 @@ class Controller:
         )
         time.sleep(0.1)
 
-    def handle_mouse(self, mouse_info): #номер х у нажата/отжата
+    # метод отправляет на сервер байты "номер_кнопки_мыши координата_Х координата_У"
+    def handle_mouse(self, mouse_info):
         self.connection_to_server.send_event(
             (
                 str(mouse_info[0]) + ' ' +
@@ -29,8 +32,8 @@ class Controller:
 
     def events_interceptor(self):
 
-        from display_class import display #!!!! какая-то магия
-        # порождает объект display при каждом import'e
+        from display_class import display # вызываем игровой экран (display - объект класса Display)
+        # какая-то магия! порождает объект display при каждом import'e
         # проблема в том, что при вызове name_process.start() происходит повторный вызов в main файле, но тут всё норм...
 
         while True:
