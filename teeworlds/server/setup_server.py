@@ -1,36 +1,44 @@
 from connection_server_reciver import Multiconnection
 from connection_server_transmitter import Multitransmitter
+
 from multiprocessing import Process, Pipe
 
 server_host = '127.0.0.1'
 server_port = 2056
 
-client_host = '127.0.0.1'
-client_port = 38224
-
 class Server:
     def __init__(self):
-        #нужно манагерить подключения к серверу
         self.proc_list = []
-        self.setup()
+        self.alive = True
+        self.main_loop()
         
     def __del__(self):
+        game_model.__del__()
         self.stop_process()
 
-    def stop_process(self):
+    def stop_process(self): # TODO correct exit
         for proc in self.proc_list:
             proc.terminate()
 
-    def setup(self):
-        event_queue = self.get_events_buffer(server_host, server_port) # "ленивая" очередь событий, которые нужно обработать
-        world_state_sender = self.getter_world_states(client_host, client_port) # труба для отправки "кадра" TODO list
+    def main_loop(self): # TODO correct exit
+        from model import game_model # импортим модель игры
 
-        while True:
+        event_queue = self.get_events_buffer(server_host, server_port)  # "ленивая" очередь событий, которые нужно обработать
+
+        while self.alive:
+
             print('iterate')
-            s = event_queue.recv()
-            print('getted', s[0], 'from', s[1])
-            world_state_sender.send(s[0])
-            print(s[0], 'sended to', client_host, client_port)
+
+            event = event_queue.recv()
+            gamer_addr = (event[1][0], event[1][1])
+
+            print('getted', event[0], 'from', event[1])
+
+            if gamer_addr not in game_model.gamers_dict.keys():
+                game_model.connect(gamer_addr, self.getter_world_states(event[1][0], event[1][1])) # TODO отправку осуществлять не на тот же порт, что и вход
+                continue
+
+            game_model.handle_event(event)
 
     def get_events_buffer(self, server_host, server_port):
         parent_conn, child_conn = Pipe()

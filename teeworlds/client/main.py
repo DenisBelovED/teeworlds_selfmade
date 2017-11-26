@@ -7,7 +7,7 @@ from connection_client_reciver import Data_reciver # импортим класс
 server_host = '127.0.0.1'
 server_port = 2056
 
-client_host = '127.0.0.1'
+client_host = ''
 client_port = 38224
 
 # метод вернёт процес "контроллер"
@@ -21,12 +21,12 @@ def start_generating_controller_event(server_host, server_port, proc_list):
     return controller_proc
 
 # метод вернёт очередь состояний игрового мира
-def start_reciving_world_state(server_host, server_port, proc_list):
+def start_reciving_world_state(client_host, client_port, proc_list):
     data_queue = Queue()
 
     getting_world_states_proc = Process(
         target=Data_reciver,
-        args=(server_host, server_port, data_queue)
+        args=(client_host, client_port, data_queue)
     )
     getting_world_states_proc.start()
     proc_list.append(getting_world_states_proc)
