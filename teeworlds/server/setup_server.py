@@ -30,20 +30,26 @@ class Server:
 
         while self.alive:
 
-            print('iterate')
+            if event_queue.poll():
+                event = event_queue.recv()
+                gamer_addr = (event[1][0], event[1][1])
 
-            event = event_queue.recv()
-            gamer_addr = (event[1][0], event[1][1])
+                print('getted', event[0], 'from', event[1])
 
-            print('getted', event[0], 'from', event[1])
+                # тут добавляем игрока в модель, если раньше его не было
+                if event[0] == b'HI':
+                    game_model.connect(gamer_addr, self.getter_world_states(event[1][0], event[1][1]))
+                    continue
 
-            # тут добавляем игрока в модель, если раньше его не было
-            if (event[0] == b'HI') and (gamer_addr not in game_model.gamers_dict.keys()):
-                game_model.connect(gamer_addr, self.getter_world_states(event[1][0], event[1][1]))
-                continue
+                # тут удаляем игрока, когда он закрывает клиент
+                if event[0][0:3] == b'DIS':
+                    string = event[0].decode('utf-8')
+                    lst = string.split()
+                    game_model.disconnect((lst[1], int(lst[2])))
+                    continue
 
-            #тут обработка событий
-            game_model.handle_event(event)
+                #тут обработка событий
+                game_model.handle_event(event)
 
     def get_events_buffer(self, server_host, server_port):
         parent_conn, child_conn = Pipe()

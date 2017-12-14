@@ -9,10 +9,10 @@ server_host = '127.0.0.1'
 server_port = 2056
 
 # метод вернёт процес "контроллер"
-def start_generating_controller_event(server_host, server_port, proc_list):
+def start_generating_controller_event(cl_host, cl_port, server_host, server_port, proc_list):
     controller_proc = Process(
         target=Controller,
-        args=(server_host, server_port)
+        args=(cl_host, cl_port, server_host, server_port)
     )
     controller_proc.start()
     proc_list.append(controller_proc)
@@ -49,16 +49,17 @@ def init_connection():
     return addr
 
 def run_game(s_host, s_port, proc_list):
+    # тут сообщаем серверу про наш открытый порт TODO fix необходимости запускать клиент позже сервера
+    c_host, c_port = init_connection()
 
     # запуск процесса отправки событий на сервер
     controller_proc = start_generating_controller_event(
+        c_host,
+        c_port,
         s_host,
         s_port,
         proc_list
     )
-
-    # тут сообщаем серверу про наш открытый порт TODO fix необходимости запускать клиент позже сервера
-    c_host, c_port = init_connection()
 
     # труба, получалка "кадров" от сервера
     get_world_state_queue = start_reciving_world_state(

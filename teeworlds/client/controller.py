@@ -6,7 +6,8 @@ import time
 from connection_client_transmitter import Connection # класс, выделяющий сокет
 
 class Controller:
-    def __init__(self, ip_host, port):
+    def __init__(self, cl_host, cl_port, ip_host, port):
+        self.id = (cl_host, cl_port)
         self.connection_to_server = Connection(ip_host, port) # инициируем сокет для отправки данных
         self.events_interceptor() # запускаем цикл перехвата кнопок
 
@@ -67,6 +68,7 @@ class Controller:
                 self.handle_keyboard(K_SPACE)
 
             if event.type == QUIT:
+                self.connection_to_server.send_event(('DIS'+' '+str(self.id[0])+' '+str(self.id[1])))
                 pygame.event.clear()
                 break
 

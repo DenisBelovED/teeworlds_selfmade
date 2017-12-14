@@ -25,8 +25,8 @@ class Model:
         pass
 
     def disconnect(self, gamer_addr):
-        #TODO
-        pass
+        self.gamers_dict.pop(gamer_addr)
+        self.connected_client_dict.pop(gamer_addr)
 
     def connect(self, gamer_addr, pipe_conn):
         self.gamers_dict.update({gamer_addr : None}) # TODO None change from player

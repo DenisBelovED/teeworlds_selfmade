@@ -10,8 +10,10 @@ class Multitransmitter:
         self.udp_socket = socket(AF_INET, SOCK_DGRAM)
         self.udp_socket.connect(self.client_addr)
 
-        while True:
-            self.udp_socket.send(pipe_out_connection.recv())
-
-    def __del__(self):
-        self.udp_socket.close()
+        try:
+            while True:
+                self.udp_socket.send(pipe_out_connection.recv())
+        except:
+            print(self.client_addr, ' - disconnect')
+        finally:
+            self.udp_socket.close()
