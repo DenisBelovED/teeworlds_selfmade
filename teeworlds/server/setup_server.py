@@ -2,6 +2,8 @@ from connection_server_reciver import Multiconnection
 from connection_server_transmitter import Multitransmitter
 
 from multiprocessing import Process, Pipe
+import psutil
+from socket import *
 
 server_host = '127.0.0.1'
 server_port = 2056
@@ -11,14 +13,15 @@ class Server:
         self.proc_list = []
         self.alive = True
         self.main_loop()
-        
-    def __del__(self):
-        game_model.__del__()
-        self.stop_process()
 
-    def stop_process(self): # TODO correct exit
+    # тут убиваем все порождённые процессы
+    def stop_process(self):
+        game_model.__del__()
         for proc in self.proc_list:
-            proc.terminate()
+            try:
+                psutil.Process(proc.pid).kill()
+            except:
+                pass
 
     def main_loop(self): # TODO correct exit
         from model import game_model # импортим модель игры
@@ -34,10 +37,12 @@ class Server:
 
             print('getted', event[0], 'from', event[1])
 
-            if gamer_addr not in game_model.gamers_dict.keys():
-                game_model.connect(gamer_addr, self.getter_world_states(event[1][0], event[1][1])) # TODO отправку осуществлять не на тот же порт, что и вход
+            # тут добавляем игрока в модель, если раньше его не было
+            if (event[0] == b'HI') and (gamer_addr not in game_model.gamers_dict.keys()):
+                game_model.connect(gamer_addr, self.getter_world_states(event[1][0], event[1][1]))
                 continue
 
+            #тут обработка событий
             game_model.handle_event(event)
 
     def get_events_buffer(self, server_host, server_port):

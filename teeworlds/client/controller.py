@@ -17,7 +17,7 @@ class Controller:
                 str(button_info)
             )
         )
-        time.sleep(0.1)
+        time.sleep(0.5)
 
     # метод отправляет на сервер байты "номер_кнопки_мыши координата_Х координата_У"
     def handle_mouse(self, mouse_info):
@@ -28,17 +28,16 @@ class Controller:
                 str(mouse_info[1][1])
             )
         )
-        time.sleep(0.1)
+        time.sleep(0.5)
 
     def events_interceptor(self):
 
-        from display_class import display # вызываем игровой экран (display - объект класса Display)
-        # какая-то магия! порождает объект display при каждом import'e
-        # проблема в том, что при вызове name_process.start() происходит повторный вызов в main файле, но тут всё норм...
+        from display_class import display
+
+        button_pressed = False
 
         while True:
             event = pygame.event.poll()
-            pressed_mouse = pygame.mouse.get_pressed()
             pressed = pygame.key.get_pressed()
 
             try:
@@ -46,16 +45,22 @@ class Controller:
             except:
                 pass
 
-            if (event.type == MOUSEBUTTONDOWN) and (event.button) == 1:
-                self.handle_mouse((1, event.pos))
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+                button_pressed = True
 
-            if pressed_mouse[2] == 1:
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 3:
+                button_pressed = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                self.handle_mouse((1, pos)) #TODO одновременное нажатие не работает
+
+            if button_pressed:
                 self.handle_mouse((3, pos))
 
-            if pressed[K_a] == 1:
+            if pressed[K_a]:
                 self.handle_keyboard(K_a)
 
-            if pressed[K_d] == 1:
+            if pressed[K_d]:
                 self.handle_keyboard(K_d)
 
             if (event.type == KEYDOWN) and (event.key == K_SPACE):

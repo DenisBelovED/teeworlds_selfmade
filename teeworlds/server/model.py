@@ -1,3 +1,5 @@
+from socket import *
+
 class Model:
     def __init__(self):
         self.gamers_dict = {} # {адрес : персоонаж}
@@ -29,7 +31,7 @@ class Model:
     def connect(self, gamer_addr, pipe_conn):
         self.gamers_dict.update({gamer_addr : None}) # TODO None change from player
         self.connected_client_dict.update({gamer_addr: pipe_conn})
-        #TODO доработка
+        print(gamer_addr, ' - has been connected')
         self.spawn(gamer_addr)
 
     def spawn(self, gamer_addr):
