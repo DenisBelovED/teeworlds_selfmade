@@ -18,7 +18,7 @@ class Controller:
                 str(button_info)
             )
         )
-        time.sleep(0.5)
+        time.sleep(0.1)
 
     # метод отправляет на сервер байты "номер_кнопки_мыши координата_Х координата_У"
     def handle_mouse(self, mouse_info):
@@ -29,15 +29,20 @@ class Controller:
                 str(mouse_info[1][1])
             )
         )
-        time.sleep(0.5)
+        time.sleep(0.1)
 
     def events_interceptor(self):
-
         from display_class import display
-
         button_pressed = False
+        start_time = time.time()
 
         while True:
+            # отправить серверу данные о своей активности
+            now_time = time.time()
+            if now_time-start_time > 60:
+                start_time = int(now_time)
+                self.connection_to_server.send_event('ONLINE')
+
             event = pygame.event.poll()
             pressed = pygame.key.get_pressed()
 

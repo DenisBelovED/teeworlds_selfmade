@@ -71,12 +71,10 @@ def run_game(s_host, s_port, proc_list):
     if (c_port is not None) and (c_host is not None):
         # главный цикл игры
         while controller_proc.is_alive():
-            try:
-                picture = get_world_state_queue.get(timeout=1)
+            if not get_world_state_queue.empty():
+                picture = get_world_state_queue.get()
                 print('recive', picture, 'from', c_host, c_port)
                 print()
-            except:
-                print('empty queue')
 
 
 def main():

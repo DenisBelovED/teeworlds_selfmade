@@ -41,6 +41,10 @@ class Server:
                     game_model.connect(gamer_addr, self.getter_world_states(event[1][0], event[1][1]))
                     continue
 
+                if event[0] == b'ONLINE':
+                    # TODO
+                    continue
+
                 # тут удаляем игрока, когда он закрывает клиент
                 if event[0][0:3] == b'DIS':
                     string = event[0].decode('utf-8')
