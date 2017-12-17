@@ -1,4 +1,4 @@
-from  setup_server import Server
+from server_model import Server
 
 def main():
     s1 = Server()

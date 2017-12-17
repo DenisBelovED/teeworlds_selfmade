@@ -39,9 +39,9 @@ class Controller:
         while True:
             # отправить серверу данные о своей активности
             now_time = time.time()
-            if now_time-start_time > 60:
+            if now_time-start_time > 5:
                 start_time = int(now_time)
-                self.connection_to_server.send_event('ONLINE')
+                self.connection_to_server.send_event(('ONLINE'+' '+str(self.id[0])+' '+str(self.id[1])))
 
             event = pygame.event.poll()
             pressed = pygame.key.get_pressed()
