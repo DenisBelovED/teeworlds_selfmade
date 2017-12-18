@@ -13,18 +13,18 @@ class Server:
     def __init__(self):
         self.proc_list = []
         self.alive = True
+        self.server_work_time = time.time()
         self.main_loop()
 
     # тут убиваем все порождённые процессы
     def stop_process(self):
-        game_model.__del__()
         for proc in self.proc_list:
             try:
                 psutil.Process(proc.pid).kill()
             except:
                 pass
 
-    def main_loop(self): # TODO correct exit
+    def main_loop(self):
         from model import game_model # импортим модель игры
         event_queue = self.get_events_buffer(server_host, server_port)  # "ленивая" очередь событий, которые нужно обработать
         start_record = time.time()
@@ -62,6 +62,16 @@ class Server:
             if time.time() - start_record > 15:
                 start_record = time.time()
                 game_model.kik_afk_players()
+
+            # если в мире больше минуты нет игроков, он закрывается
+            if not game_model.gamers_dict:
+                if time.time() - self.server_work_time > 60:
+                    print('stop game world')
+                    self.alive=False
+            else:
+                self.server_work_time=time.time()
+
+        self.stop_process()
 
     def get_events_buffer(self, server_host, server_port):
         parent_conn, child_conn = Pipe()
