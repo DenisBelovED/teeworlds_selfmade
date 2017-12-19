@@ -78,6 +78,11 @@ def run_game(s_host, s_port, proc_list):
 
 
 def main():
+    import sys
+    path = sys.path[0]
+    path = path[:-6] + 'maps'
+    sys.path.append(path)
+
     proc_list = [] # тут храним дочерние процессы
 
     run_game(server_host, server_port, proc_list)

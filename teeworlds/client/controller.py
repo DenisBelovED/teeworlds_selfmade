@@ -33,6 +33,7 @@ class Controller:
 
     def events_interceptor(self):
         from display_class import display
+        from map_class import map1, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR
         button_pressed = False
         start_time = time.time()
 
@@ -77,7 +78,9 @@ class Controller:
                 pygame.event.clear()
                 break
 
-            display.render()
+            display.render_background()
+            display.rendering_map(map1, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR)
+            display.display_update()
 
         self.connection_to_server.destroy_socket()
         display.kill_screen()

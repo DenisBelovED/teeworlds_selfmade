@@ -1,27 +1,13 @@
 from socket import *
 import time
 
+from player import Player
+
 class Model:
     def __init__(self):
         self.gamers_dict = {} # {адрес : персоонаж}
         self.connected_client_dict = {} # {addr : pipe}
         self.gamers_time = {} # {addr : time}
-
-    def hook(self):
-        #TODO
-        pass
-
-    def shot(self):
-        #todo
-        pass
-
-    def jump(self):
-        #TODO
-        pass
-
-    def move(self):
-        #TODO
-        pass
 
     def disconnect(self, gamer_addr):
         self.gamers_dict.pop(gamer_addr)
@@ -37,7 +23,7 @@ class Model:
 
     def connect(self, gamer_addr, pipe_conn):
         self.gamers_time.update({gamer_addr : time.time()})
-        self.gamers_dict.update({gamer_addr : None}) # TODO None change from player
+        self.gamers_dict.update({gamer_addr : Player()})
         self.connected_client_dict.update({gamer_addr: pipe_conn})
         print(gamer_addr, ' - has been connected')
         self.spawn(gamer_addr)
