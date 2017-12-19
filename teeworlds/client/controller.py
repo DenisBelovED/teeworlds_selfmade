@@ -77,6 +77,8 @@ class Controller:
                 pygame.event.clear()
                 break
 
+            display.render()
+
         self.connection_to_server.destroy_socket()
         display.kill_screen()
         os._exit(0)
