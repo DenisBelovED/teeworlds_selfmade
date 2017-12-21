@@ -42,17 +42,13 @@ class Server:
                     continue
 
                 # здесь игрок говорит серверу, что он подключён
-                if event[0][0:6] == b'ONLINE':
-                    string = event[0].decode('utf-8')
-                    lst = string.split()
-                    game_model.update_player_time((lst[1], int(lst[2])))
+                if event[0] == b'ONLINE':
+                    game_model.update_player_time(event[1])
                     continue
 
                 # тут удаляем игрока, когда он закрывает клиент
-                if event[0][0:3] == b'DIS':
-                    string = event[0].decode('utf-8')
-                    lst = string.split()
-                    game_model.disconnect((lst[1], int(lst[2])))
+                if event[0] == b'DIS':
+                    game_model.disconnect(event[1])
                     continue
 
                 # тут обработка событий
@@ -73,6 +69,7 @@ class Server:
 
         self.stop_process()
 
+    # процесс для чтения данных
     def get_events_buffer(self, server_host, server_port):
         parent_conn, child_conn = Pipe()
 
@@ -84,12 +81,13 @@ class Server:
         self.proc_list.append(connection_for_sending_world_state)
         return parent_conn
 
+    # процесс для отправки данных клиенту
     def getter_world_states(self, trans_host, trans_port):
         parent_conn, child_conn = Pipe()
 
         connection_for_sending_world_state = Process(
             target=Multitransmitter,
-            args=(trans_host, trans_port, child_conn)
+            args=(trans_host, (trans_port + 1), child_conn)
         )
         connection_for_sending_world_state.start()
         self.proc_list.append(connection_for_sending_world_state)

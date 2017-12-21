@@ -14,7 +14,7 @@ class Display:
         self.back_groung = Surface(DISPLAY)
         self.back_groung.fill(Color(BACKGROUND_COLOR))
 
-    def render_background(self):
+    def rendering_background(self):
         self.screen.blit(self.back_groung, (0, 0))
 
     def rendering_map(self, map, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR):

@@ -9,7 +9,7 @@ class Multiconnection:
         self.udp_socket.bind(self.server_addr)
 
         while True:
-            pipe_out_connection.send(self.udp_socket.recvfrom(32))
+            pipe_out_connection.send(self.udp_socket.recvfrom(128))
 
     def __del__(self):
         self.udp_socket.close()

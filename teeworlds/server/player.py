@@ -1,35 +1,23 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from pygame import *
 
-MOVE_SPEED = 7
+MOVE_SPEED = 1
 WIDTH = 22
 HEIGHT = 32
-COLOR = "#888888"
 
-
-class Player(sprite.Sprite):
+class Player():
     def __init__(self, x, y):
-        sprite.Sprite.__init__(self)
-        self.xvel = 0  # скорость перемещения. 0 - стоять на месте
-        self.startX = x  # Начальная позиция Х, пригодится когда будем переигрывать уровень
-        self.startY = y
-        self.image = Surface((WIDTH, HEIGHT))
-        self.image.fill(Color(COLOR))
-        self.rect = Rect(x, y, WIDTH, HEIGHT)  # прямоугольный объект
+        self.delta_x = 0
+        #self.startX = x
+        #self.startY = y
+        self.rect = Rect(x, y, WIDTH, HEIGHT) #TODO need Rect?
 
-    def update(self, left, right):
-        if left:
-            self.xvel = -MOVE_SPEED  # Лево = x- n
+    def update_model(self, event):
+        if event == b'97':
+            self.delta_x = -MOVE_SPEED
+        if event == b'100':
+            self.delta_x = MOVE_SPEED
+        self.rect.x += self.delta_x
+        self.delta_x = 0
 
-        if right:
-            self.xvel = MOVE_SPEED  # Право = x + n
-
-        if not (left or right):  # стоим, когда нет указаний идти
-            self.xvel = 0
-
-        self.rect.x += self.xvel  # переносим свои положение на xvel
-
-    def draw(self, screen):  # Выводим себя на экран
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+    def get_coordinates(self):
+        return (self.rect.x, self.rect.y)

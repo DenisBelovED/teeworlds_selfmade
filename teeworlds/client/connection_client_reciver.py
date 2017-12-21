@@ -7,7 +7,7 @@ class Data_reciver:
         self.udp_socket.bind(self.addr)
 
         while True:
-            data_queue.put_nowait(self.udp_socket.recvfrom(32))
+            data_queue.put_nowait(self.udp_socket.recv(128))
 
     def __del__(self):
         self.udp_socket.close()

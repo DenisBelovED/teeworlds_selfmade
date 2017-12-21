@@ -6,9 +6,8 @@ import time
 from connection_client_transmitter import Connection # класс, выделяющий сокет
 
 class Controller:
-    def __init__(self, cl_host, cl_port, ip_host, port):
-        self.id = (cl_host, cl_port)
-        self.connection_to_server = Connection(ip_host, port) # инициируем сокет для отправки данных
+    def __init__(self, sock):
+        self.connection_to_server = Connection(sock) # инициируем сокет для отправки данных
         self.events_interceptor() # запускаем цикл перехвата кнопок
 
     # метод отправляет на сервер байты "номер_клавиши"
@@ -42,7 +41,7 @@ class Controller:
             now_time = time.time()
             if now_time-start_time > 5:
                 start_time = int(now_time)
-                self.connection_to_server.send_event(('ONLINE'+' '+str(self.id[0])+' '+str(self.id[1])))
+                self.connection_to_server.send_event('ONLINE')
 
             event = pygame.event.poll()
             pressed = pygame.key.get_pressed()
@@ -74,11 +73,11 @@ class Controller:
                 self.handle_keyboard(K_SPACE)
 
             if event.type == QUIT:
-                self.connection_to_server.send_event(('DIS'+' '+str(self.id[0])+' '+str(self.id[1])))
+                self.connection_to_server.send_event('DIS')
                 pygame.event.clear()
                 break
 
-            display.render_background()
+            display.rendering_background()
             display.rendering_map(map1, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR)
             display.display_update()
 

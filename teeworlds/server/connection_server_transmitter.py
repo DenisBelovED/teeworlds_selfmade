@@ -1,8 +1,6 @@
-#здесь описана отправка данных всем подключённым клиеентам
-
+#здесь описана отправка данных клиенту
 from socket import *
 from multiprocessing import Process, Pipe
-
 
 class Multitransmitter:
     def __init__(self, client_host, client_port, pipe_out_connection):
