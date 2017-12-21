@@ -1,8 +1,9 @@
 from pygame import *
 
-MOVE_SPEED = 1
+MOVE_SPEED = 3
 WIDTH = 22
 HEIGHT = 32
+
 
 class Player():
     def __init__(self, x, y):

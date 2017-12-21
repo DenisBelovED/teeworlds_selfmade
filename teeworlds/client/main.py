@@ -1,4 +1,4 @@
-from multiprocessing import Process, Pipe, Queue
+from multiprocessing import Process, Queue
 import psutil # делаем sudo -H pip3 install psutil
 from socket import *
 
@@ -10,13 +10,15 @@ server_port = 2056
 
 # метод вернёт процес "контроллер"
 def start_generating_controller_event(sock, proc_list):
+    data_queue = Queue()
+
     controller_proc = Process(
         target=Controller,
-        args=(sock, )
+        args=(sock, data_queue)
     )
     controller_proc.start()
     proc_list.append(controller_proc)
-    return controller_proc
+    return (controller_proc, data_queue)
 
 # метод вернёт очередь состояний игрового мира
 def start_reciving_world_state(client_host, client_port, proc_list):
@@ -70,7 +72,7 @@ def run_game(s_host, s_port, proc_list):
 
     # запуск процесса отправки событий на сервер
     try:
-        controller_proc = start_generating_controller_event(
+        controller_proc, data_queue = start_generating_controller_event(
             sock,
             proc_list
         )
@@ -80,19 +82,10 @@ def run_game(s_host, s_port, proc_list):
         c_port = None
 
     if (c_port is not None) and (c_host is not None):
-        from visible_objects.player import Player
-        player_sprite_list = [Player() for i in range(16)]
-
         # главный цикл игры
         while controller_proc.is_alive():
             if not get_world_state_queue.empty():
-                coord_list = get_world_state_queue.get().split(b' ')
-                for i in range(len(coord_list)):
-                    b_x, b_y = coord_list[i].split(b',')
-                    player_sprite_list[i].update(int(b_x), int(b_y))
-
-                print('recive', picture, 'from', c_host, c_port)
-                print()
+                data_queue.put_nowait(get_world_state_queue.get()[:-1].split(b' '))
     else:
         print('try restart client')
 

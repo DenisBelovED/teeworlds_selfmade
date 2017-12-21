@@ -48,7 +48,7 @@ class Model:
         world_state = self.__serialize(world_state)
         for client in self.connected_client_dict:
             self.connected_client_dict[client].send(world_state)
-            print(world_state, ' - genered and sended')
+            #print(world_state, ' - genered and sended')
 
     # тут обновляем время присутствия тех, кто послал нам b'ONLINE'
     def update_player_time(self, gamer_addr):

@@ -6,7 +6,8 @@ import time
 from connection_client_transmitter import Connection # класс, выделяющий сокет
 
 class Controller:
-    def __init__(self, sock):
+    def __init__(self, sock, data_queue):
+        self.data_queue = data_queue
         self.connection_to_server = Connection(sock) # инициируем сокет для отправки данных
         self.events_interceptor() # запускаем цикл перехвата кнопок
 
@@ -17,7 +18,7 @@ class Controller:
                 str(button_info)
             )
         )
-        time.sleep(0.1)
+        time.sleep(0.003)
 
     # метод отправляет на сервер байты "номер_кнопки_мыши координата_Х координата_У"
     def handle_mouse(self, mouse_info):
@@ -28,11 +29,15 @@ class Controller:
                 str(mouse_info[1][1])
             )
         )
-        time.sleep(0.1)
+        time.sleep(0.003)
 
     def events_interceptor(self):
         from display_class import display
         from map_class import map1, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR
+
+        from visible_objects.player import Player
+        player_sprite_list = [Player() for i in range(16)]
+
         button_pressed = False
         start_time = time.time()
 
@@ -77,8 +82,15 @@ class Controller:
                 pygame.event.clear()
                 break
 
+            if not self.data_queue.empty(): #TODO доработать
+                coord_list = self.data_queue.get_nowait()
+                for i in range(len(coord_list)):
+                    b_x, b_y = coord_list[i].split(b',')
+                    player_sprite_list[i].update(int(b_x), int(b_y))
+
             display.rendering_background()
             display.rendering_map(map1, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR)
+            display.rendering_players(player_sprite_list)
             display.display_update()
 
         self.connection_to_server.destroy_socket()

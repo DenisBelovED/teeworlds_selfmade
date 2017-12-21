@@ -1,6 +1,5 @@
 from pygame import *
 
-MOVE_SPEED = 7
 WIDTH = 22
 HEIGHT = 32
 COLOR = "#888888"
@@ -22,6 +21,6 @@ class Player(sprite.Sprite):
         else:
             self.visible = True
 
-    def rendering_player(self, screen):
-        if self.visible:
-            screen.blit(self.image, (self.rect.x, self.rect.y))
+    def reset(self):
+        self.rect.x = -1
+        self.rect.y = -1
