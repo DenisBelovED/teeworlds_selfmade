@@ -1,5 +1,5 @@
 from multiprocessing import Process, Queue
-import psutil # делаем sudo -H pip3 install psutil
+import psutil
 from socket import *
 
 from controller import Controller # импоритм класс-процесс "контроллер"
