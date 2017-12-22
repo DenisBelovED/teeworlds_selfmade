@@ -58,11 +58,10 @@ def run_game(s_host, s_port, proc_list):
         c_host = None
         c_port = None
 
-    # труба, получалка "кадров" от сервера
+    # запуск процесса отправки событий на сервер
     try:
-        get_world_state_queue = start_reciving_world_state(
-            c_host,
-            c_port,
+        controller_proc, data_queue = start_generating_controller_event(
+            sock,
             proc_list
         )
     except:
@@ -70,10 +69,11 @@ def run_game(s_host, s_port, proc_list):
         c_host = None
         c_port = None
 
-    # запуск процесса отправки событий на сервер
+    # труба, получалка "кадров" от сервера
     try:
-        controller_proc, data_queue = start_generating_controller_event(
-            sock,
+        get_world_state_queue = start_reciving_world_state(
+            c_host,
+            c_port,
             proc_list
         )
     except:

@@ -16,7 +16,7 @@ class Player(sprite.Sprite):
     def update(self, x, y):
         self.rect.x = x
         self.rect.y = y
-        if x < 0:
+        if self.rect.x < 0:
             self.visible = False
         else:
             self.visible = True
@@ -24,3 +24,4 @@ class Player(sprite.Sprite):
     def reset(self):
         self.rect.x = -1
         self.rect.y = -1
+        self.visible = False

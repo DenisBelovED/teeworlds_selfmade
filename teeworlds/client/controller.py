@@ -18,7 +18,6 @@ class Controller:
                 str(button_info)
             )
         )
-        time.sleep(0.003)
 
     # метод отправляет на сервер байты "номер_кнопки_мыши координата_Х координата_У"
     def handle_mouse(self, mouse_info):
@@ -29,8 +28,8 @@ class Controller:
                 str(mouse_info[1][1])
             )
         )
-        time.sleep(0.003)
 
+    # метод для снятия событий с клавиатуры и их отправки
     def events_interceptor(self):
         from display_class import display
         from map_class import map1, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR
@@ -38,7 +37,7 @@ class Controller:
         from visible_objects.player import Player
         player_sprite_list = [Player() for i in range(16)]
 
-        button_pressed = False
+        #button_pressed = False
         start_time = time.time()
 
         while True:
@@ -56,37 +55,47 @@ class Controller:
             except:
                 pass
 
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-                button_pressed = True
+            #if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+            #    button_pressed = True
 
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 3:
-                button_pressed = False
+            #if event.type == pygame.MOUSEBUTTONUP and event.button == 3:
+            #    button_pressed = False
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.handle_mouse((1, pos)) #TODO одновременное нажатие не работает
 
-            if button_pressed:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
                 self.handle_mouse((3, pos))
 
-            if pressed[K_a]:
+            #if button_pressed:
+            #    self.handle_mouse((3, pos))
+
+            if pressed[K_a] and not pressed[K_d]:
                 self.handle_keyboard(K_a)
 
-            if pressed[K_d]:
+            if pressed[K_d] and not pressed[K_a]:
                 self.handle_keyboard(K_d)
 
             if (event.type == KEYDOWN) and (event.key == K_SPACE):
                 self.handle_keyboard(K_SPACE)
+
+            if (event.type == KEYDOWN) and (event.key == K_RETURN):
+                self.connection_to_server.send_event('SPAWN')
 
             if event.type == QUIT:
                 self.connection_to_server.send_event('DIS')
                 pygame.event.clear()
                 break
 
-            if not self.data_queue.empty(): #TODO доработать
+            if not self.data_queue.empty():
                 coord_list = self.data_queue.get_nowait()
-                for i in range(len(coord_list)):
-                    b_x, b_y = coord_list[i].split(b',')
-                    player_sprite_list[i].update(int(b_x), int(b_y))
+                count_online = len(coord_list)
+                for i in range(16):
+                    if i < count_online:
+                        b_x, b_y = coord_list[i].split(b',')
+                        player_sprite_list[i].update(int(b_x), int(b_y))
+                    else:
+                        player_sprite_list[i].reset()
 
             display.rendering_background()
             display.rendering_map(map1, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR)

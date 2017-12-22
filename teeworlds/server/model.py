@@ -11,9 +11,13 @@ class Model:
 
     # отключаем одного игрока
     def disconnect(self, gamer_addr):
-        self.gamers_dict.pop(gamer_addr)
-        self.connected_client_dict.pop(gamer_addr)
-        self.gamers_time.pop(gamer_addr)
+        try:
+            self.gamers_dict.pop(gamer_addr)
+        except:
+            pass
+        finally:
+            self.connected_client_dict.pop(gamer_addr)
+            self.gamers_time.pop(gamer_addr)
 
     #отключаем лист игроков
     def disconnect_list(self, kik_list):
@@ -26,26 +30,34 @@ class Model:
     # подключаем игрока
     def connect(self, gamer_addr, pipe_conn):
         self.gamers_time.update({gamer_addr : time.time()})
-        self.gamers_dict.update({gamer_addr : Player(50, 50)}) #TODO spawn and spawn point
         self.connected_client_dict.update({gamer_addr: pipe_conn})
         print(gamer_addr, ' - has been connected')
-        self.spawn(gamer_addr)
 
+    #генерируем точку спавна TODO доработать
+    def get_spawn_point(self):
+        x = 50
+        y = 50
+        return (x, y)
+
+    # спавним игрока, когда от него пришло событие b'SPAWN'
     def spawn(self, gamer_addr):
-        #TODO spawn
-        print(gamer_addr, ' - spawned')
+        x, y = self.get_spawn_point()
+        self.gamers_dict.update({gamer_addr : Player(x, y)})
+        self.world_rendering()
+        print('new player spawned')
 
     # обработка события от клиента
     def handle_event(self, event):
-        self.gamers_dict[event[1]].update_model(event[0]);
-        world_state = []
-        for addr in self.gamers_dict:
-            world_state.append(self.gamers_dict[addr].get_coordinates())
-        self.world_rendering(world_state)
+        try:
+            self.gamers_dict[event[1]].update_model(event[0])
+            self.world_rendering()
+        except:
+            pass
+            #print('player not spawned')
 
     # отправка состояния игрового мира всем клиентам
-    def world_rendering(self, world_state):
-        world_state = self.__serialize(world_state)
+    def world_rendering(self):
+        world_state = self.__serialize([self.gamers_dict[addr].get_coordinates() for addr in self.gamers_dict])
         for client in self.connected_client_dict:
             self.connected_client_dict[client].send(world_state)
             #print(world_state, ' - genered and sended')

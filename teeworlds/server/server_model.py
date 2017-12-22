@@ -34,7 +34,7 @@ class Server:
                 event = event_queue.recv()
                 gamer_addr = (event[1][0], event[1][1])
 
-                #print('getted', event[0], 'from', event[1])
+                # print('getted', event[0], 'from', event[1])
 
                 # тут добавляем игрока в модель, если раньше его не было
                 if event[0] == b'HI':
@@ -51,6 +51,11 @@ class Server:
                     game_model.disconnect(event[1])
                     continue
 
+                # спавним игрока, когда он нажал ентер
+                if event[0] == b'SPAWN':
+                    game_model.spawn(event[1])
+                    continue
+
                 # тут обработка событий
                 game_model.handle_event(event)
 
@@ -61,7 +66,7 @@ class Server:
 
             # если в мире больше минуты нет игроков, он закрывается
             if not game_model.gamers_dict:
-                if time.time() - self.server_work_time > 60:
+                if time.time() - self.server_work_time > 300:
                     print('stop game world')
                     self.alive=False
             else:
