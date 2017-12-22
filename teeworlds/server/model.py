@@ -47,13 +47,13 @@ class Model:
         print('new player spawned')
 
     # обработка события от клиента
-    def handle_event(self, event):
-        try:
-            self.gamers_dict[event[1]].update_model(event[0])
-            self.world_rendering()
-        except:
-            pass
-            #print('player not spawned')
+    def handle_event(self, event = None):
+        for gamer in self.gamers_dict:
+            try:
+                self.gamers_dict[gamer].update_model(event)
+                self.world_rendering()
+            except:
+                pass
 
     # отправка состояния игрового мира всем клиентам
     def world_rendering(self):

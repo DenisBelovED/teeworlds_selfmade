@@ -57,7 +57,9 @@ class Server:
                     continue
 
                 # тут обработка событий
-                game_model.handle_event(event)
+                game_model.handle_event(event[0])
+            else:
+                game_model.handle_event()
 
             # тут удаляем тех, у кого отвалилось соединение
             if time.time() - start_record > 15:

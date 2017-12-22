@@ -39,8 +39,10 @@ class Controller:
 
         #button_pressed = False
         start_time = time.time()
+        fps_timer = pygame.time.Clock()
 
         while True:
+            fps_timer.tick(60)
             # отправить серверу данные о своей активности
             now_time = time.time()
             if now_time-start_time > 5:
@@ -90,12 +92,13 @@ class Controller:
             if not self.data_queue.empty():
                 coord_list = self.data_queue.get_nowait()
                 count_online = len(coord_list)
-                for i in range(16):
-                    if i < count_online:
-                        b_x, b_y = coord_list[i].split(b',')
-                        player_sprite_list[i].update(int(b_x), int(b_y))
-                    else:
-                        player_sprite_list[i].reset()
+                if not (count_online == 1 and coord_list[0] == b''):
+                    for i in range(16):
+                        if i < count_online:
+                            b_x, b_y = coord_list[i].split(b',')
+                            player_sprite_list[i].update(int(b_x), int(b_y))
+                        else:
+                            player_sprite_list[i].reset()
 
             display.rendering_background()
             display.rendering_map(map1, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR)
