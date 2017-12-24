@@ -42,7 +42,7 @@ class Controller:
         fps_timer = pygame.time.Clock()
 
         while True:
-            fps_timer.tick(60)
+            fps_timer.tick(120)
             # отправить серверу данные о своей активности
             now_time = time.time()
             if now_time-start_time > 5:

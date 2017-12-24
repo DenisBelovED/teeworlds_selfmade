@@ -61,6 +61,7 @@ class Model:
                 self.gamers_dict[addr].update_model(None)
         finally:
             self.world_rendering()
+        #TODO need optimization
 
     # отправка состояния игрового мира всем клиентам
     def world_rendering(self):

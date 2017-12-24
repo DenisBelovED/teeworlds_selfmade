@@ -33,7 +33,7 @@ class Server:
         event = [None, None]
 
         while self.alive:
-            server_tick.tick(60)
+            server_tick.tick(120)
             event = [None, None]
             if event_queue.poll():
                 event = event_queue.recv()
