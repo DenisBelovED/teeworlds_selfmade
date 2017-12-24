@@ -53,11 +53,15 @@ class Model:
             print(gamer_addr, ' - has been spawned')
 
     # обработка события от клиента
-    def handle_event(self, event):
-        if len(self.gamers_dict) > 0:
-            for gamer in self.gamers_dict:
-                self.gamers_dict[gamer].update_model(event)
+    def handle_event(self, event, addr):
+        if (event is not None) and (len(self.gamers_dict) > 0):
+            self.gamers_dict[addr].update_model(event)
             self.world_rendering()
+        else:
+            if len(self.gamers_dict) > 0:
+                for addr in self.gamers_dict:
+                    self.gamers_dict[addr].update_model(None)
+                self.world_rendering()
 
     # отправка состояния игрового мира всем клиентам
     def world_rendering(self):

@@ -30,10 +30,11 @@ class Server:
         event_queue = self.get_events_buffer(server_host, server_port)  # "ленивая" очередь событий, которые нужно обработать
         start_record = time.time()
         server_tick = Clock() # магия, без которой не работает
+        event = [None, None]
 
         while self.alive:
             server_tick.tick(60)
-            event = [None]
+            event = [None, None]
             if event_queue.poll():
                 event = event_queue.recv()
                 gamer_addr = (event[1][0], event[1][1])
@@ -61,7 +62,7 @@ class Server:
                     continue
 
             # тут обработка событий
-            game_model.handle_event(event[0])
+            game_model.handle_event(event[0], event[1])
 
             # тут удаляем тех, у кого отвалилось соединение
             if time.time() - start_record > 15:
