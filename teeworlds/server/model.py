@@ -54,14 +54,13 @@ class Model:
 
     # обработка события от клиента
     def handle_event(self, event, addr):
-        if (event is not None) and (len(self.gamers_dict) > 0):
+        try:
             self.gamers_dict[addr].update_model(event)
+        except:
+            for addr in self.gamers_dict:
+                self.gamers_dict[addr].update_model(None)
+        finally:
             self.world_rendering()
-        else:
-            if len(self.gamers_dict) > 0:
-                for addr in self.gamers_dict:
-                    self.gamers_dict[addr].update_model(None)
-                self.world_rendering()
 
     # отправка состояния игрового мира всем клиентам
     def world_rendering(self):
