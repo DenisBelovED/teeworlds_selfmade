@@ -4,7 +4,7 @@ from pygame import *
 WIN_WIDTH = 800 # ширина создаваемого окна
 WIN_HEIGHT = 640 # высота
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
-BACKGROUND_COLOR = "#00FF00"
+BACKGROUND_COLOR = "#ADD8E6"
 
 class Display:
     def __init__(self):

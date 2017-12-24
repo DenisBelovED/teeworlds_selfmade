@@ -8,6 +8,7 @@ class Model:
         self.gamers_dict = {} # {адрес : player}
         self.connected_client_dict = {} # {addr : pipe}
         self.gamers_time = {} # {addr : time}
+        self.spawned_players = {} # {addr : bool}
 
     # отключаем одного игрока
     def disconnect(self, gamer_addr):
@@ -18,6 +19,7 @@ class Model:
         finally:
             self.connected_client_dict.pop(gamer_addr)
             self.gamers_time.pop(gamer_addr)
+            self.spawned_players.pop(gamer_addr)
 
     #отключаем лист игроков
     def disconnect_list(self, kik_list):
@@ -25,12 +27,14 @@ class Model:
             self.gamers_dict.pop(addr)
             self.connected_client_dict.pop(addr)
             self.gamers_time.pop(addr)
+            self.spawned_players.pop(addr)
         print(kik_list, ' - unactive')
 
     # подключаем игрока
     def connect(self, gamer_addr, pipe_conn):
         self.gamers_time.update({gamer_addr : time.time()})
         self.connected_client_dict.update({gamer_addr: pipe_conn})
+        self.spawned_players.update({gamer_addr : False})
         print(gamer_addr, ' - has been connected')
 
     #генерируем точку спавна TODO доработать
@@ -41,19 +45,19 @@ class Model:
 
     # спавним игрока, когда от него пришло событие b'SPAWN'
     def spawn(self, gamer_addr):
-        x, y = self.get_spawn_point()
-        self.gamers_dict.update({gamer_addr : Player(x, y)})
-        self.world_rendering()
-        print('new player spawned')
+        if not self.spawned_players[gamer_addr]:
+            x, y = self.get_spawn_point()
+            self.gamers_dict.update({gamer_addr : Player(x, y)})
+            self.spawned_players[gamer_addr] = True
+            self.world_rendering()
+            print(gamer_addr, ' - has been spawned')
 
     # обработка события от клиента
-    def handle_event(self, event = None):
-        for gamer in self.gamers_dict:
-            try:
+    def handle_event(self, event):
+        if len(self.gamers_dict) > 0:
+            for gamer in self.gamers_dict:
                 self.gamers_dict[gamer].update_model(event)
-                self.world_rendering()
-            except:
-                pass
+            self.world_rendering()
 
     # отправка состояния игрового мира всем клиентам
     def world_rendering(self):

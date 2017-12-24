@@ -5,6 +5,7 @@ from multiprocessing import Process, Pipe
 import psutil
 from socket import *
 import time
+from pygame.time import Clock
 
 server_host = '127.0.0.1'
 server_port = 2056
@@ -28,13 +29,16 @@ class Server:
         from model import game_model # импортим модель игры
         event_queue = self.get_events_buffer(server_host, server_port)  # "ленивая" очередь событий, которые нужно обработать
         start_record = time.time()
+        server_tick = Clock() # магия, без которой не работает
 
         while self.alive:
+            server_tick.tick(60)
+            event = [None]
             if event_queue.poll():
                 event = event_queue.recv()
                 gamer_addr = (event[1][0], event[1][1])
 
-                # print('getted', event[0], 'from', event[1])
+                #print('getted', event[0], 'from', event[1])
 
                 # тут добавляем игрока в модель, если раньше его не было
                 if event[0] == b'HI':
@@ -56,10 +60,8 @@ class Server:
                     game_model.spawn(event[1])
                     continue
 
-                # тут обработка событий
-                game_model.handle_event(event[0])
-            else:
-                game_model.handle_event()
+            # тут обработка событий
+            game_model.handle_event(event[0])
 
             # тут удаляем тех, у кого отвалилось соединение
             if time.time() - start_record > 15:

@@ -1,10 +1,10 @@
-from pygame import *
+from pygame.rect import Rect
 
 MOVE_SPEED = 5
 WIDTH = 22
 HEIGHT = 32
 JUMP_POWER = 10
-GRAVITY = 0.35
+GRAVITY = 1
 
 
 class Player():
@@ -16,8 +16,8 @@ class Player():
     def update_model(self, event):
         if event == b'32' and self.onGround:
             self.yvel = -JUMP_POWER
-        if not self.onGround:
-            self.yvel += GRAVITY
+        if (not self.onGround) and (self.rect.y<200):
+            self.yvel = GRAVITY
         if event == b'97':
             self.rect.x -= MOVE_SPEED
         if event == b'100':
@@ -25,6 +25,7 @@ class Player():
 
         self.onGround = False
         self.rect.y += self.yvel
+        self.yvel=0
 
     def get_coordinates(self):
         return (self.rect.x, self.rect.y)

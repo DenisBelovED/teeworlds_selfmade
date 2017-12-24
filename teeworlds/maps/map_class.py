@@ -1,6 +1,6 @@
 PLATFORM_WIDTH = 32
 PLATFORM_HEIGHT = 32
-PLATFORM_COLOR = "#FF6262"
+PLATFORM_COLOR = "#006400"
 
 map1 = [
        "-------------------------",

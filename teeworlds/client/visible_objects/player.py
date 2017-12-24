@@ -2,7 +2,7 @@ from pygame import *
 
 WIDTH = 22
 HEIGHT = 32
-COLOR = "#888888"
+COLOR = "#2F4F4F"
 
 
 class Player(sprite.Sprite):
