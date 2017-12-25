@@ -10,6 +10,3 @@ class Multiconnection:
 
         while True:
             pipe_out_connection.send(self.udp_socket.recvfrom(128))
-
-    def __del__(self):
-        self.udp_socket.close()

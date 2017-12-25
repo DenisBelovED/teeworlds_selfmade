@@ -18,21 +18,16 @@ class Player(Sprite):
         self.rect = Rect(x, y, WIDTH, HEIGHT)
 
     def update_model(self, event, platforms):
-        left = False
-        right = False
-
-        if event == b'32' and self.onGround:
+        if event[0] == '1' and self.onGround:
             self.yvel = -JUMP_POWER
 
-        if event == b'97':
+        if event[1] == '1':
             self.xvel = -MOVE_SPEED
-            left = True
 
-        if event == b'100':
+        if event[2] == '1':
             self.xvel = MOVE_SPEED
-            right = True
 
-        if not (left or right):
+        if not ((event[1] == '1') or (event[2] == '1')):
             self.xvel = 0
 
         if not self.onGround:

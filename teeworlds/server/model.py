@@ -54,7 +54,7 @@ class Model:
     # спавним игрока, когда от него пришло событие b'SPAWN'
     def spawn(self, gamer_addr):
         try:
-            if not self.spawned_players[gamer_addr]:
+            if (not self.spawned_players[gamer_addr]) and (len(self.spawned_players)<=16):
                 x, y = self.get_spawn_point()
                 self.gamers_dict.update({gamer_addr : Player(x, y)})
                 self.spawned_players[gamer_addr] = True
@@ -67,11 +67,12 @@ class Model:
     # обработка события от клиента
     def handle_event(self, event, addr):
         if len(self.gamers_dict) > 0:
-            if event is not None:
-                self.gamers_dict[addr].update_model(event, self.world.platforms)
+            if (event is not None):
+                if (addr in self.gamers_dict):
+                    self.gamers_dict[addr].update_model(event.decode(), self.world.platforms)
             else:
                 for addr in self.gamers_dict:
-                    self.gamers_dict[addr].update_model(None, self.world.platforms)
+                    self.gamers_dict[addr].update_model('000', self.world.platforms)
             self.world_rendering()
 
     # отправка состояния игрового мира всем клиентам
@@ -85,7 +86,7 @@ class Model:
     def update_player_time(self, gamer_addr):
         current_time = time.time()
         self.gamers_time[gamer_addr] = current_time
-        print(gamer_addr, ' - time updated')
+        #print(gamer_addr, ' - time updated')
 
     # удаляем тех, кто перестал нам посылать пакет b'ONLINE'
     def kik_afk_players(self):

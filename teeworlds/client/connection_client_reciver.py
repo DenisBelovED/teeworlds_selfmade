@@ -1,4 +1,5 @@
 from socket import *
+import os
 
 class Data_reciver:
     def __init__(self, client_host, client_port, data_queue):
@@ -6,9 +7,11 @@ class Data_reciver:
         self.udp_socket = socket(AF_INET, SOCK_DGRAM)
         self.udp_socket.bind(self.addr)
 
-        while True:
-            data_queue.put_nowait(self.udp_socket.recv(128))
-
-    def __del__(self):
-        self.udp_socket.close()
-
+        try:
+            while True:
+                data_queue.put_nowait(self.udp_socket.recv(128))
+        except:
+            data_queue.put_nowait(None)
+            self.udp_socket.close()
+            data_queue.close()
+            os._exit(0)

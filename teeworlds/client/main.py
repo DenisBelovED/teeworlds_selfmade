@@ -1,5 +1,4 @@
 from multiprocessing import Process, Queue
-import psutil
 from socket import *
 
 from controller import Controller # импоритм класс-процесс "контроллер"
@@ -9,12 +8,12 @@ server_host = '127.0.0.1'
 server_port = 2056
 
 # метод вернёт процес "контроллер"
-def start_generating_controller_event(sock, proc_list):
+def start_generating_controller_event(sock, sock2, proc_list):
     data_queue = Queue()
 
     controller_proc = Process(
         target=Controller,
-        args=(sock, data_queue)
+        args=(sock, sock2, data_queue)
     )
     controller_proc.start()
     proc_list.append(controller_proc)
@@ -36,7 +35,7 @@ def start_reciving_world_state(client_host, client_port, proc_list):
 def stop_process(proc_list):
     for proc in proc_list:
         try:
-            psutil.Process(proc.pid).kill()
+            killTree(proc)
         except:
             pass
 
@@ -44,17 +43,19 @@ def stop_process(proc_list):
 # чтобы он знал какой порт для входящих кадров ему выделен
 def init_connection():
     sock = socket(AF_INET, SOCK_DGRAM)
+    sock2 = socket(AF_INET, SOCK_DGRAM)
     sock.connect((server_host, server_port))
+    sock2.connect((server_host, server_port+1))
     sock.send(b'HI')
-    return sock
+    return sock, sock2
 
 def run_game(s_host, s_port, proc_list):
     # тут сообщаем серверу про наш открытый порт TODO fix необходимости запускать клиент позже сервера
     try:
-        sock = init_connection()
+        sock, sock2 = init_connection()
         c_host, c_port = sock.getsockname()
     except:
-        ConnectionError()
+        raise ConnectionError()
         c_host = None
         c_port = None
 
@@ -62,10 +63,11 @@ def run_game(s_host, s_port, proc_list):
     try:
         controller_proc, data_queue = start_generating_controller_event(
             sock,
+            sock2,
             proc_list
         )
     except:
-        ConnectionError()
+        raise ConnectionError()
         c_host = None
         c_port = None
 
@@ -77,18 +79,38 @@ def run_game(s_host, s_port, proc_list):
             proc_list
         )
     except:
-        ConnectionError()
+        raise ConnectionError()
         c_host = None
         c_port = None
 
     if (c_port is not None) and (c_host is not None):
         # главный цикл игры
-        while controller_proc.is_alive():
-            if not get_world_state_queue.empty():
-                data_queue.put_nowait(get_world_state_queue.get()[:-1].split(b' '))
+        try:
+            while controller_proc.is_alive():
+                if not get_world_state_queue.empty():
+                    data_queue.put_nowait(get_world_state_queue.get()[:-1].split(b' '))
+        except:
+            data_queue.put_nowait(None)
     else:
         print('try restart client')
 
+# метод убивает дерево процессов, работает на wondows и linux !!!!!
+def killTree(pid):
+    import platform
+    import subprocess
+    import re
+    pl = platform.system()
+    if pl == 'Windows':
+        subprocess.Popen('taskkill /PID %d /T /f' % pid, shell = True)
+    elif pl == 'Linux':
+        PIPE = subprocess.PIPE
+        p = subprocess.Popen('pstree -p %d' % pid, shell=True, stdin=PIPE, stdout=PIPE,
+                stderr=subprocess.STDOUT, close_fds=True)
+        res = ''.join( p.stdout.readlines() )
+        d = re.findall('\((\d+)\)',res)
+        if d:
+            for i in d:
+                subprocess.Popen('kill -9 ' + i, shell = True)
 
 def main():
     import sys
@@ -97,10 +119,12 @@ def main():
     sys.path.append(path)
 
     proc_list = [] # тут храним дочерние процессы
-
     run_game(server_host, server_port, proc_list)
-
-    stop_process(proc_list)
+    pid_list = []
+    for i in proc_list:
+        pid_list.append(i.pid)
+        pid_list.append(i._parent_pid)
+    stop_process(pid_list)
 
 if __name__ == '__main__':
     main()

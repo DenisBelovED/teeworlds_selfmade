@@ -27,7 +27,7 @@ class Server:
 
     def main_loop(self):
         from model import game_model # импортим модель игры
-        event_queue = self.get_events_buffer(server_host, server_port)  # "ленивая" очередь событий, которые нужно обработать
+        control_event, player_event = self.get_events_buffer(server_host, server_port)  # "ленивая" очередь событий, которые нужно обработать
         start_record = time.time()
         server_tick = Clock() # магия, без которой не работает
         event = [None, None]
@@ -35,8 +35,8 @@ class Server:
         while self.alive:
             server_tick.tick(60)
             event = [None, None]
-            if event_queue.poll():
-                event = event_queue.recv()
+            if control_event.poll():
+                event = control_event.recv()
                 gamer_addr = (event[1][0], event[1][1])
 
                 #print('getted', event[0], 'from', event[1])
@@ -61,6 +61,11 @@ class Server:
                     game_model.spawn(event[1])
                     continue
 
+            if player_event.poll():
+                event = player_event.recv()
+                event = (event[0], (event[1][0], event[1][1]-1))
+
+
             # тут обработка событий
             game_model.handle_event(event[0], event[1])
 
@@ -71,7 +76,7 @@ class Server:
 
             # если в мире больше минуты нет игроков, он закрывается
             if not game_model.gamers_dict:
-                if time.time() - self.server_work_time > 300:
+                if time.time() - self.server_work_time > 60: # сервер отключится после минуты простоя
                     print('stop game world')
                     self.alive=False
             else:
@@ -79,17 +84,27 @@ class Server:
 
         self.stop_process()
 
-    # процесс для чтения данных
+    # процессы для чтения данных
     def get_events_buffer(self, server_host, server_port):
         parent_conn, child_conn = Pipe()
+        parent, child = Pipe()
 
-        connection_for_sending_world_state = Process(
+        connection_for_recive_control_event = Process(
             target=Multiconnection,
             args=(server_host, server_port, child_conn)
         )
-        connection_for_sending_world_state.start()
-        self.proc_list.append(connection_for_sending_world_state)
-        return parent_conn
+
+        connection_for_recive_player_event = Process(
+            target=Multiconnection,
+            args=(server_host, server_port+1, child)
+        )
+        
+        connection_for_recive_control_event.start()
+        connection_for_recive_player_event.start()
+        
+        self.proc_list.append(connection_for_recive_control_event)
+        self.proc_list.append(connection_for_recive_player_event)
+        return parent_conn, parent
 
     # процесс для отправки данных клиенту
     def getter_world_states(self, trans_host, trans_port):

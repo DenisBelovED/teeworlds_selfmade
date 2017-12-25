@@ -12,9 +12,3 @@ class Connection:
                 self.udp_socket.send(str.encode(queue.get()))
             except:
                 pass
-
-    '''def destroy_socket(self):
-        self.udp_socket.close()
-
-    def is_close(self):
-        return self.udp_socket._closed'''
