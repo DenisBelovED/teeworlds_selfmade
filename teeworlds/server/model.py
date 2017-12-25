@@ -17,25 +17,25 @@ class Model:
     # отключаем одного игрока
     def disconnect(self, gamer_addr):
         try:
+            self.connected_client_dict.pop(gamer_addr)
             self.world.remove_entity(self.gamers_dict[gamer_addr])
             self.gamers_dict.pop(gamer_addr)
-            self.connected_client_dict.pop(gamer_addr)
-            self.gamers_time.pop(gamer_addr)
-            self.spawned_players.pop(gamer_addr)
         except:
             print(gamer_addr, 'incorrect exit (single)')
+        self.gamers_time.pop(gamer_addr)
+        self.spawned_players.pop(gamer_addr)
 
     #отключаем лист игроков
     def disconnect_list(self, kik_list):
         for addr in kik_list:
             try:
+                self.connected_client_dict.pop(addr)
                 self.world.remove_entity(self.gamers_dict[addr])
                 self.gamers_dict.pop(addr)
             except:
                 print(addr, 'incorrect exit (list)')
-            self.connected_client_dict.pop(addr)
-            self.gamers_time.pop(addr)
-            self.spawned_players.pop(addr)
+                self.gamers_time.pop(addr)
+                self.spawned_players.pop(addr)
         print(kik_list, ' - unactive')
 
     # подключаем игрока
