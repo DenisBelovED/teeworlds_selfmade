@@ -2,6 +2,8 @@ from socket import *
 import time
 
 from player import Player
+from game_world import Game_world
+from map_class import map1
 
 class Model:
     def __init__(self):
@@ -9,22 +11,28 @@ class Model:
         self.connected_client_dict = {} # {addr : pipe}
         self.gamers_time = {} # {addr : time}
         self.spawned_players = {} # {addr : bool}
+        self.world = Game_world()
+        self.world.uploading_map(map1)
 
     # отключаем одного игрока
     def disconnect(self, gamer_addr):
         try:
+            self.world.remove_entity(self.gamers_dict[gamer_addr])
             self.gamers_dict.pop(gamer_addr)
-        except:
-            pass
-        finally:
             self.connected_client_dict.pop(gamer_addr)
             self.gamers_time.pop(gamer_addr)
             self.spawned_players.pop(gamer_addr)
+        except:
+            print(gamer_addr, 'incorrect exit (single)')
 
     #отключаем лист игроков
     def disconnect_list(self, kik_list):
         for addr in kik_list:
-            self.gamers_dict.pop(addr)
+            try:
+                self.world.remove_entity(self.gamers_dict[addr])
+                self.gamers_dict.pop(addr)
+            except:
+                print(addr, 'incorrect exit (list)')
             self.connected_client_dict.pop(addr)
             self.gamers_time.pop(addr)
             self.spawned_players.pop(addr)
@@ -45,23 +53,26 @@ class Model:
 
     # спавним игрока, когда от него пришло событие b'SPAWN'
     def spawn(self, gamer_addr):
-        if not self.spawned_players[gamer_addr]:
-            x, y = self.get_spawn_point()
-            self.gamers_dict.update({gamer_addr : Player(x, y)})
-            self.spawned_players[gamer_addr] = True
-            self.world_rendering()
-            print(gamer_addr, ' - has been spawned')
+        try:
+            if not self.spawned_players[gamer_addr]:
+                x, y = self.get_spawn_point()
+                self.gamers_dict.update({gamer_addr : Player(x, y)})
+                self.spawned_players[gamer_addr] = True
+                self.world.add_entity(self.gamers_dict[gamer_addr])
+                self.world_rendering()
+                print(gamer_addr, ' - has been spawned')
+        except:
+            pass
 
     # обработка события от клиента
     def handle_event(self, event, addr):
-        try:
-            self.gamers_dict[addr].update_model(event)
-        except:
-            for addr in self.gamers_dict:
-                self.gamers_dict[addr].update_model(None)
-        finally:
+        if len(self.gamers_dict) > 0:
+            if event is not None:
+                self.gamers_dict[addr].update_model(event, self.world.platforms)
+            else:
+                for addr in self.gamers_dict:
+                    self.gamers_dict[addr].update_model(None, self.world.platforms)
             self.world_rendering()
-        #TODO need optimization
 
     # отправка состояния игрового мира всем клиентам
     def world_rendering(self):

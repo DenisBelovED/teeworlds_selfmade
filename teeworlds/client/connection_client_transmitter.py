@@ -1,19 +1,20 @@
 from socket import *
-import sys
-import time
+from pygame.time import Clock
+from multiprocessing import Queue
 
 class Connection:
-    def __init__(self, sock):
+    def __init__(self, sock, queue):
         self.udp_socket = sock
+        self.antilag_timer = Clock()
+        while True:
+            self.antilag_timer.tick(60)
+            try:
+                self.udp_socket.send(str.encode(queue.get()))
+            except:
+                pass
 
-    def send_event(self, event):
-        try:
-            self.udp_socket.send(str.encode(event))
-        except:
-            print('no connection to server')
-
-    def destroy_socket(self):
+    '''def destroy_socket(self):
         self.udp_socket.close()
 
     def is_close(self):
-        return self.udp_socket._closed
+        return self.udp_socket._closed'''
