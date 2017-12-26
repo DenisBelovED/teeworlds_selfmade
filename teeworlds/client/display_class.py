@@ -9,6 +9,16 @@ BACKGROUND_COLOR = "#ADD8E6"
 class Display:
     def __init__(self):
         pygame.init()
+        self.texture = {
+            'w': pygame.image.load('textures/horisontal_grass.png'),
+            'a': pygame.image.load('textures/anti_vertical_grass.png'),
+            'd': pygame.image.load('textures/vertical_grass.png'),
+            's': pygame.image.load('textures/anti_horisontal_grass.png'),
+            'q': pygame.image.load('textures/lu_grass.png'),
+            'e': pygame.image.load('textures/ru_grass.png'),
+            'z': pygame.image.load('textures/ld_grass.png'),
+            'c': pygame.image.load('textures/rd_grass.png'),
+        }
         self.screen = pygame.display.set_mode(DISPLAY, 0, 32)
         pygame.display.set_caption('Teeworlds')
         self.back_groung = Surface(DISPLAY)
@@ -22,15 +32,13 @@ class Display:
     def rendering_background(self):
         self.screen.blit(self.back_groung, (0, 0))
 
-    def rendering_map(self, map, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR):
+    def rendering_map(self, map, PLATFORM_WIDTH, PLATFORM_HEIGHT):
         x = 0
         y = 0
         for row in map:
             for col in row:
-                if col == "-":
-                    block = Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
-                    block.fill(Color(PLATFORM_COLOR))
-                    self.screen.blit(block, (x, y))
+                if col != " ":
+                    self.screen.blit(self.texture[col], (x, y))
                 x += PLATFORM_WIDTH
             y += PLATFORM_HEIGHT
             x = 0

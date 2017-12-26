@@ -88,7 +88,7 @@ def run_game(s_host, s_port, proc_list):
         try:
             while controller_proc.is_alive():
                 if not get_world_state_queue.empty():
-                    data_queue.put_nowait(get_world_state_queue.get()[:-1].split(b' '))
+                    data_queue.put(get_world_state_queue.get()[:-1].split(b' '))
         except:
             data_queue.put_nowait(None)
     else:
@@ -115,8 +115,8 @@ def killTree(pid):
 def main():
     import sys
     path = sys.path[0]
-    path = path[:-6] + 'maps'
-    sys.path.append(path)
+    path1 = path[:-6] + 'maps'
+    sys.path.append(path1)
 
     proc_list = [] # тут храним дочерние процессы
     run_game(server_host, server_port, proc_list)
@@ -124,7 +124,7 @@ def main():
     for i in proc_list:
         pid_list.append(i.pid)
         pid_list.append(i._parent_pid)
-    stop_process(pid_list)
+        stop_process(pid_list)
 
 if __name__ == '__main__':
     main()

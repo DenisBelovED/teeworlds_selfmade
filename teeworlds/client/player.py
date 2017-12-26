@@ -1,13 +1,12 @@
 from pygame import *
 
-WIDTH = 22
+WIDTH = 32
 HEIGHT = 32
 COLOR = "#2F4F4F"
 
 
-class Player(sprite.Sprite):
+class Player:
     def __init__(self, x = -1, y = -1):
-        sprite.Sprite.__init__(self)
         self.image = Surface((WIDTH, HEIGHT))
         self.image.fill(Color(COLOR))
         self.rect = Rect(x, y, WIDTH, HEIGHT)

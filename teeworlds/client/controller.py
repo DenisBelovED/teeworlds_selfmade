@@ -22,7 +22,7 @@ class Controller:
     # независимо от скорости отрисовки
     def create_event_sender(self, sock, sock2):
         queue = Queue()
-        queue2 = Queue(5) # ограничение, чтобы не дудосить сервер
+        queue2 = Queue(3) # ограничение, чтобы не дудосить сервер
 
         connection_for_sending_control_events = Process(
             target=Connection,
@@ -51,7 +51,7 @@ class Controller:
                     str(self.player_button_bytes[2])
                 )
 
-    # метод отправляет на сервер байты "номер_кнопки_мыши координата_Х координата_У"
+    '''# метод отправляет на сервер байты "номер_кнопки_мыши координата_Х координата_У"
     def handle_mouse(self, mouse_info):
         if self.queue_for_transmit_player_event.full():
             self.queue_for_transmit_player_event.get()
@@ -61,14 +61,14 @@ class Controller:
                 str(mouse_info[1][0]) + ' ' +
                 str(mouse_info[1][1])
             )
-        )
+        )'''
 
     # метод для снятия событий с клавиатуры и их отправки
     def events_interceptor(self):
         from display_class import display
-        from map_class import map1, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR
+        from map_class import map1, PLATFORM_WIDTH, PLATFORM_HEIGHT
 
-        from visible_objects.player import Player
+        from player import Player
         player_sprite_list = [Player() for i in range(16)]
 
         #button_pressed = False
@@ -95,25 +95,25 @@ class Controller:
             #if event.type == pygame.MOUSEBUTTONUP and event.button == 3:
             #    button_pressed = False
 
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            '''if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.handle_mouse((1, pos)) #TODO одновременное нажатие не работает
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-                self.handle_mouse((3, pos))
+                self.handle_mouse((3, pos))'''
 
             #if button_pressed:
             #    self.handle_mouse((3, pos))
 
             self.player_button_bytes = [0, 0, 0]
 
-            if pressed[K_SPACE]:
-                self.player_button_bytes[0] = 1
-
             if pressed[K_a] and not pressed[K_d]:
                 self.player_button_bytes[1] = 1
 
             if pressed[K_d] and not pressed[K_a]:
                 self.player_button_bytes[2] = 1
+
+            if pressed[K_SPACE]:
+                self.player_button_bytes[0] = 1
 
             self.handle_keyboard()
 
@@ -140,7 +140,7 @@ class Controller:
                             player_sprite_list[i].reset()
 
             display.rendering_background()
-            display.rendering_map(map1, PLATFORM_WIDTH, PLATFORM_HEIGHT, PLATFORM_COLOR) #TODO get map from server
+            display.rendering_map(map1, PLATFORM_WIDTH, PLATFORM_HEIGHT) #TODO get map from server
             display.rendering_players(player_sprite_list)
             display.display_update()
 

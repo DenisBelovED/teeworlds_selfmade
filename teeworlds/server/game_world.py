@@ -18,7 +18,7 @@ class Game_world():
         y = 0
         for row in map:
             for col in row:
-                if col == "-":
+                if col != " ":
                     platform = Platform(x, y)
                     self.all_entities.add(platform)
                     self.platforms.append(platform)

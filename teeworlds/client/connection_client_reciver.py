@@ -1,5 +1,6 @@
 from socket import *
 import os
+from multiprocessing import Queue
 
 class Data_reciver:
     def __init__(self, client_host, client_port, data_queue):
@@ -9,9 +10,9 @@ class Data_reciver:
 
         try:
             while True:
-                data_queue.put_nowait(self.udp_socket.recv(128))
+                data_queue.put(self.udp_socket.recv(128))
         except:
-            data_queue.put_nowait(None)
+            data_queue.put(None)
             self.udp_socket.close()
             data_queue.close()
             os._exit(0)
