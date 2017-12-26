@@ -3,7 +3,7 @@ from pygame.sprite import Sprite
 from pygame.sprite import collide_rect
 
 MOVE_SPEED = 3
-WIDTH = 32
+WIDTH = 22
 HEIGHT = 32
 JUMP_POWER = 10
 GRAVITY = 0.35

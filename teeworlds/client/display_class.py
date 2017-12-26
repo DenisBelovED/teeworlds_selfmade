@@ -27,7 +27,9 @@ class Display:
     def rendering_players(self, players_list):
         for player in players_list:
             if player.visible:
-                self.screen.blit(player.image, (player.rect.x, player.rect.y))
+                pass
+                #player.render(self) TODO rendering player
+                #self.screen.blit(player.image, (player.rect.x, player.rect.y))
 
     def rendering_background(self):
         self.screen.blit(self.back_groung, (0, 0))
