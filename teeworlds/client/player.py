@@ -30,6 +30,7 @@ class Player:
         self.rect = Rect(x, y, WIDTH, HEIGHT)
         self.delta_x = 0
         self.delta_y = 0
+        self.id = -1 # -1 означает, что сущности не существует
         self.visible = False
 
         #        Анимация движения вправо

@@ -8,6 +8,7 @@ from connection_client_transmitter import Connection # класс, выделя�
 
 class Controller:
     def __init__(self, sock, sock2, data_queue):
+        self.my_player = None
         self.data_queue = data_queue # очередь с кадрами на отрисовку
         self.proc_conn1 = None
         self.proc_conn2 = None
@@ -67,17 +68,24 @@ class Controller:
     def events_interceptor(self):
         from display_class import display
         from map_class import map1, PLATFORM_WIDTH, PLATFORM_HEIGHT
-        #from Camera import Camera
+        from Camera import Camera
 
         from player import Player
         player_sprite_list = [Player() for i in range(16)]
 
+        def get_spawned_players():
+            lst = []
+            for p in player_sprite_list:
+                if p.id != -1:
+                   lst.append(p)
+            return lst
+
         #button_pressed = False
         start_time = time.time()
 
-        #total_level_width = len(map1[0]) * PLATFORM_WIDTH  # высчитываем фактическую ширину уровня
-        #total_level_height = len(map1) * PLATFORM_HEIGHT  # высоту
-        #camera = Camera(total_level_width, total_level_height)
+        total_level_width = len(map1[0]) * PLATFORM_WIDTH  # высчитываем фактическую ширину уровня
+        total_level_height = len(map1) * PLATFORM_HEIGHT  # высоту
+        camera = Camera(total_level_width, total_level_height)
 
         while True:
             # отправить серверу данные о своей активности
@@ -132,23 +140,47 @@ class Controller:
 
             # считываем данные объектов, и далее их отрисовываем
             if not self.data_queue.empty():
-                coord_list = self.data_queue.get_nowait()
-                if coord_list is None:
+                data_list = b''
+
+                data_list = self.data_queue.get_nowait()
+                
+                if data_list is None:
                     break
-                count_online = len(coord_list)
-                if not (count_online == 1 and coord_list[0] == b''):
+
+                if data_list[0] == b'id':
+                    id = int(data_list[1])
+                    self.my_player = player_sprite_list[id]
+                    self.my_player.id = id
+                    continue
+                
+                count_bytestr = len(data_list)
+
+                if (not (count_bytestr == 1 and data_list[0] == b'')) and (data_list[0] != b'id'):
+                    id_connected_list = []
+
+                    for block_bytes in data_list:
+                        b_x, b_y, id = block_bytes.split(b',')
+                        b_x = int(b_x)
+                        b_y = int(b_y)
+                        id = int(id)
+                        player_sprite_list[id].update(b_x, b_y)
+                        id_connected_list.append(id)
+
                     for i in range(16):
-                        if i < count_online:
-                            b_x, b_y = coord_list[i].split(b',')
-                            player_sprite_list[i].update(int(b_x), int(b_y))
-                        else:
+                        if i not in id_connected_list:
                             player_sprite_list[i].reset()
 
-            display.rendering_background()
-            display.rendering_map(map1, PLATFORM_WIDTH, PLATFORM_HEIGHT) #TODO get map from server
-            #display.rendering_players(player_sprite_list, camera)
-            display.rendering_players(player_sprite_list)
-            display.display_update()
+            if self.my_player is None:
+                display.rendering_background()
+                display.rendering_map(map1) #TODO get map from server
+                display.rendering_players(player_sprite_list)
+                display.display_update()
+            else:
+                display.rendering_background()
+                camera.update(self.my_player)
+                display.rendering_map_for_self(camera, map1)  # TODO get map from server
+                display.rendering_players_for_self(camera, player_sprite_list)
+                display.display_update()
 
         time.sleep(0.1) # дожидаемся дисконнекта
         self.proc_conn1.terminate()

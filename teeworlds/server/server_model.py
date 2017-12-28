@@ -39,7 +39,7 @@ class Server:
                 event = control_event.recv()
                 gamer_addr = (event[1][0], event[1][1])
 
-                #print('getted', event[0], 'from', event[1])
+                print('getted', event[0], 'from', event[1])
 
                 # тут добавляем игрока в модель, если раньше его не было
                 if event[0] == b'HI':

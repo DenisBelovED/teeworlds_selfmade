@@ -1,5 +1,6 @@
 import pygame
 from pygame import *
+from block import Platform, PLATFORM_HEIGHT, PLATFORM_WIDTH
 
 WIN_WIDTH = 800 # ширина создаваемого окна
 WIN_HEIGHT = 640 # высота
@@ -24,17 +25,33 @@ class Display:
         self.back_groung = Surface(DISPLAY)
         self.back_groung.fill(Color(BACKGROUND_COLOR))
 
-    def rendering_players(self, players_list):#, camera):
+    def rendering_players(self, players_list):
         for player in players_list:
             if player.visible:
                 self.screen.blit(player.image, (player.rect.x, player.rect.y))
-                #camera.update(player)
+                player.render()
+
+    def rendering_players_for_self(self, camera, players_list):
+        for player in players_list:
+            if player.visible:
+                self.screen.blit(player.image, camera.apply(player))
                 player.render()
 
     def rendering_background(self):
         self.screen.blit(self.back_groung, (0, 0))
 
-    def rendering_map(self, map, PLATFORM_WIDTH, PLATFORM_HEIGHT):
+    def rendering_map_for_self(self, camera, map):
+        x = 0
+        y = 0
+        for row in map:
+            for col in row:
+                if col != " ":
+                    self.screen.blit(self.texture[col], camera.apply(Platform(x, y)))
+                x += PLATFORM_WIDTH
+            y += PLATFORM_HEIGHT
+            x = 0
+
+    def rendering_map(self, map):
         x = 0
         y = 0
         for row in map:
