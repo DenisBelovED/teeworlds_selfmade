@@ -24,10 +24,11 @@ class Display:
         self.back_groung = Surface(DISPLAY)
         self.back_groung.fill(Color(BACKGROUND_COLOR))
 
-    def rendering_players(self, players_list):
+    def rendering_players(self, players_list):#, camera):
         for player in players_list:
             if player.visible:
                 self.screen.blit(player.image, (player.rect.x, player.rect.y))
+                #camera.update(player)
                 player.render()
 
     def rendering_background(self):

@@ -67,12 +67,17 @@ class Controller:
     def events_interceptor(self):
         from display_class import display
         from map_class import map1, PLATFORM_WIDTH, PLATFORM_HEIGHT
+        #from Camera import Camera
 
         from player import Player
         player_sprite_list = [Player() for i in range(16)]
 
         #button_pressed = False
         start_time = time.time()
+
+        #total_level_width = len(map1[0]) * PLATFORM_WIDTH  # высчитываем фактическую ширину уровня
+        #total_level_height = len(map1) * PLATFORM_HEIGHT  # высоту
+        #camera = Camera(total_level_width, total_level_height)
 
         while True:
             # отправить серверу данные о своей активности
@@ -141,6 +146,7 @@ class Controller:
 
             display.rendering_background()
             display.rendering_map(map1, PLATFORM_WIDTH, PLATFORM_HEIGHT) #TODO get map from server
+            #display.rendering_players(player_sprite_list, camera)
             display.rendering_players(player_sprite_list)
             display.display_update()
 
