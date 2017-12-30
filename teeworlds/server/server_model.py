@@ -10,6 +10,7 @@ from pygame.time import Clock
 server_host = '127.0.0.1'
 server_port = 2056
 
+
 class Server:
     def __init__(self):
         self.proc_list = []
@@ -26,10 +27,11 @@ class Server:
                 pass
 
     def main_loop(self):
-        from model import game_model # импортим модель игры
-        control_event, player_event = self.get_events_buffer(server_host, server_port)  # "ленивая" очередь событий, которые нужно обработать
+        from model import game_model  # импортим модель игры
+        control_event, player_event = self.get_events_buffer(server_host,
+                                                             server_port)  # "ленивая" очередь событий, которые нужно обработать
         start_record = time.time()
-        server_tick = Clock() # магия, без которой не работает
+        server_tick = Clock()  # магия, без которой не работает
         event = [None, None]
 
         while self.alive:
@@ -39,7 +41,7 @@ class Server:
                 event = control_event.recv()
                 gamer_addr = (event[1][0], event[1][1])
 
-                print('getted', event[0], 'from', event[1])
+                # print('getted', event[0], 'from', event[1])
 
                 # тут добавляем игрока в модель, если раньше его не было
                 if event[0] == b'HI':
@@ -53,7 +55,7 @@ class Server:
 
                 # тут удаляем игрока, когда он закрывает клиент
                 if event[0] == b'DIS':
-                    game_model.disconnect(event[1])
+                    game_model.disconnect(gamer_addr)
                     continue
 
                 # спавним игрока, когда он нажал ентер
@@ -63,8 +65,7 @@ class Server:
 
             if player_event.poll():
                 event = player_event.recv()
-                event = (event[0], (event[1][0], event[1][1]-1))
-
+                event = (event[0], (event[1][0], event[1][1] - 1))
 
             # тут обработка событий
             game_model.handle_event(event[0], event[1])
@@ -76,11 +77,11 @@ class Server:
 
             # если в мире больше минуты нет игроков, он закрывается
             if not game_model.gamers_dict:
-                if time.time() - self.server_work_time > 60: # сервер отключится после минуты простоя
+                if time.time() - self.server_work_time > 60:  # сервер отключится после минуты простоя
                     print('stop game world')
-                    self.alive=False
+                    self.alive = False
             else:
-                self.server_work_time=time.time()
+                self.server_work_time = time.time()
 
         self.stop_process()
 
@@ -96,12 +97,12 @@ class Server:
 
         connection_for_recive_player_event = Process(
             target=Multiconnection,
-            args=(server_host, server_port+1, child)
+            args=(server_host, server_port + 1, child)
         )
-        
+
         connection_for_recive_control_event.start()
         connection_for_recive_player_event.start()
-        
+
         self.proc_list.append(connection_for_recive_control_event)
         self.proc_list.append(connection_for_recive_player_event)
         return parent_conn, parent

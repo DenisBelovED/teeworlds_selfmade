@@ -98,19 +98,11 @@ def run_game(s_host, s_port, proc_list):
 def killTree(pid):
     import platform
     import subprocess
-    import re
     pl = platform.system()
     if pl == 'Windows':
         subprocess.Popen('taskkill /PID %d /T /f' % pid, shell = True)
     elif pl == 'Linux':
-        PIPE = subprocess.PIPE
-        p = subprocess.Popen('pstree -p %d' % pid, shell=True, stdin=PIPE, stdout=PIPE,
-                stderr=subprocess.STDOUT, close_fds=True)
-        res = ''.join( p.stdout.readlines() )
-        d = re.findall('\((\d+)\)',res)
-        if d:
-            for i in d:
-                subprocess.Popen('kill -9 ' + i, shell = True)
+        subprocess.Popen('kill -9 ' + str(pid), shell = True)
 
 def main():
     import sys
@@ -124,7 +116,7 @@ def main():
     for i in proc_list:
         pid_list.append(i.pid)
         pid_list.append(i._parent_pid)
-        stop_process(pid_list)
+    stop_process(pid_list)
 
 if __name__ == '__main__':
     main()

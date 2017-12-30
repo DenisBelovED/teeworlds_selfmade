@@ -9,6 +9,7 @@ from connection_client_transmitter import Connection # класс, выделя�
 class Controller:
     def __init__(self, sock, sock2, data_queue):
         self.my_player = None
+        self.my_id = None
         self.data_queue = data_queue # очередь с кадрами на отрисовку
         self.proc_conn1 = None
         self.proc_conn2 = None
@@ -47,6 +48,8 @@ class Controller:
         if (self.player_button_bytes[0] | self.player_button_bytes[1] | self.player_button_bytes[2]):
             if not self.queue_for_transmit_player_event.full():
                 self.queue_for_transmit_player_event.put(
+                    str(self.my_id)+
+                    ' '+
                     str(self.player_button_bytes[0]) +
                     str(self.player_button_bytes[1]) +
                     str(self.player_button_bytes[2])
@@ -58,6 +61,8 @@ class Controller:
             self.queue_for_transmit_player_event.get()
         self.queue_for_transmit_player_event.put(
             (
+                str(self.my_id)+
+                ' '+
                 str(mouse_info[0]) + ' ' +
                 str(mouse_info[1][0]) + ' ' +
                 str(mouse_info[1][1])
@@ -149,6 +154,7 @@ class Controller:
 
                 if data_list[0] == b'id':
                     id = int(data_list[1])
+                    self.my_id = id
                     self.my_player = player_sprite_list[id]
                     self.my_player.id = id
                     continue
