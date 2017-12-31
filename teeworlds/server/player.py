@@ -12,12 +12,12 @@ GRAVITY = 0.35
 class Player(Sprite):
     def __init__(self, x, y):
         Sprite.__init__(self)
-        self.yvel = 0
-        self.xvel = 0
+        self.yvel = 0 # speed y
+        self.xvel = 0 # speed x
         self.onGround = False
         self.rect = Rect(x, y, WIDTH, HEIGHT)
 
-    def update_model(self, event, platforms):
+    def update_model(self, event, platforms): # event имеет формат 'xxx' где может быть x = 0 или x = 1
         if event[0] == '1' and self.onGround:
             self.yvel = -JUMP_POWER
 
@@ -44,6 +44,7 @@ class Player(Sprite):
     def get_coordinates(self):
         return (self.rect.x, self.rect.y)
 
+    # проверка, есть контакт с каким-нибдь объектом
     def collide_x(self, platforms):
         for p in platforms:
             if collide_rect(self, p):  # если есть пересечение платформы с игроком
@@ -54,6 +55,7 @@ class Player(Sprite):
                 if self.xvel < 0:  # если движется влево
                     self.rect.left = p.rect.right  # то не движется влево
 
+    # проверка, есть контакт с каким-нибдь объектом
     def collide_y(self, platforms):
         for p in platforms:
             if collide_rect(self, p):  # если есть пересечение платформы с игроком
