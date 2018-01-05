@@ -20,7 +20,7 @@ class Display:
             'z': pygame.image.load('textures/ld_grass.png'),
             'c': pygame.image.load('textures/rd_grass.png'),
         }
-        self.screen = pygame.display.set_mode(DISPLAY, 0, 32)
+        self.screen = pygame.display.set_mode(DISPLAY, pygame.FULLSCREEN, 32)
         pygame.display.set_caption('Teeworlds')
         self.back_groung = Surface(DISPLAY)
         self.back_groung.fill(Color(BACKGROUND_COLOR))

@@ -8,5 +8,8 @@ class Multiconnection:
         self.udp_socket = socket(AF_INET, SOCK_DGRAM)
         self.udp_socket.bind(self.server_addr)
 
-        while True:
-            pipe_out_connection.send(self.udp_socket.recvfrom(128))
+        try:
+            while True:
+                pipe_out_connection.send(self.udp_socket.recvfrom(128))
+        except:
+            self.udp_socket.close()

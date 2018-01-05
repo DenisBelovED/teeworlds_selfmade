@@ -24,7 +24,7 @@ class Controller:
     # независимо от скорости отрисовки
     def create_event_sender(self, sock, sock2):
         queue = Queue()
-        queue2 = Queue(3) # ограничение, чтобы не дудосить сервер
+        queue2 = Queue(1) # ограничение, чтобы не дудосить сервер
 
         connection_for_sending_control_events = Process(
             target=Connection,
