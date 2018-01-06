@@ -2,10 +2,12 @@ import pygame
 from pygame import *
 from block import Platform, PLATFORM_HEIGHT, PLATFORM_WIDTH
 
-WIN_WIDTH = 800 # ширина создаваемого окна
-WIN_HEIGHT = 640 # высота
+pygame.init()
+WIN_WIDTH = pygame.display.Info().current_w # ширина создаваемого окна
+WIN_HEIGHT = pygame.display.Info().current_h # высота
 DISPLAY = (WIN_WIDTH, WIN_HEIGHT)
 BACKGROUND_COLOR = "#ADD8E6"
+pygame.quit()
 
 class Display:
     def __init__(self):
@@ -20,7 +22,7 @@ class Display:
             'z': pygame.image.load('textures/ld_grass.png'),
             'c': pygame.image.load('textures/rd_grass.png'),
         }
-        self.screen = pygame.display.set_mode(DISPLAY, pygame.FULLSCREEN, 32)
+        self.screen = pygame.display.set_mode(DISPLAY, FULLSCREEN|DOUBLEBUF|HWSURFACE, 32)
         pygame.display.set_caption('Teeworlds')
         self.back_groung = Surface(DISPLAY)
         self.back_groung.fill(Color(BACKGROUND_COLOR))
@@ -30,6 +32,11 @@ class Display:
             if player.visible:
                 self.screen.blit(player.image, (player.rect.x, player.rect.y))
                 player.render()
+
+    def toggle_display(self): #TODO for debug
+        pygame.display.toggle_fullscreen()
+        WIN_WIDTH = pygame.display.Info().current_w
+        WIN_HEIGHT = pygame.display.Info().current_h
 
     def rendering_players_for_self(self, camera, players_list):
         for player in players_list:

@@ -24,7 +24,7 @@ class Controller:
     # независимо от скорости отрисовки
     def create_event_sender(self, sock, sock2):
         queue = Queue()
-        queue2 = Queue(1) # ограничение, чтобы не дудосить сервер
+        queue2 = Queue(3) # ограничение, чтобы не дудосить сервер
 
         connection_for_sending_control_events = Process(
             target=Connection,
@@ -135,10 +135,13 @@ class Controller:
 
             self.handle_keyboard()
 
+            if (pressed[K_TAB] and pressed[K_LALT]): # TODO for debug
+                display.toggle_display()
+
             if (event.type == KEYDOWN) and (event.key == K_RETURN):
                 self.queue_for_transmit_control_event.put('SPAWN')
 
-            if event.type == QUIT:
+            if (event.type == QUIT) or ( (event.type == KEYDOWN) and (event.key == K_ESCAPE) ):
                 self.queue_for_transmit_control_event.put('DIS')
                 pygame.event.clear()
                 break
